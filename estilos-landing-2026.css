@@ -1,0 +1,32 @@
+/* Hoja de estilos de la landing del Concurso Escolar BCRP
+   Se carga después de Bootstrap 5.3 (si está activado).
+   El header (.ce-header) y el footer (.ce-footer) tienen estructura fija;
+   puedes ajustar sus colores con las variables --ce-primary y --ce-primary-dark. */
+
+:root{ --ce-primary:#0A3D7A; --ce-primary-dark:#072B57; --bs-primary:#0A3D7A; --bs-primary-rgb:10,61,122; }
+
+.fw-black{ font-weight:900 !important; }
+.ls-wide{ letter-spacing:.1em; }
+.btn-primary{ --bs-btn-bg:var(--ce-primary); --bs-btn-border-color:var(--ce-primary); --bs-btn-hover-bg:var(--ce-primary-dark); --bs-btn-hover-border-color:var(--ce-primary-dark); }
+.text-primary{ color:var(--ce-primary) !important; }
+.bg-primary{ background-color:var(--ce-primary) !important; }
+
+.bcrp-gradient{ background:linear-gradient(135deg,var(--ce-primary-dark) 0%,var(--ce-primary) 60%,#1d6fc4 100%); }
+.hero-section{ min-height:560px; }
+.text-gradient-hero{ background:linear-gradient(90deg,#fff,#bfdbfe); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.text-blue-100{ color:#dbeafe; }
+.bg-white-10{ background:rgba(255,255,255,.1); }
+.border-white-20{ border-color:rgba(255,255,255,.2) !important; }
+.glass{ background:rgba(255,255,255,.85); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.separator{ width:64px; height:4px; }
+.card-hover{ transition:transform .2s ease, box-shadow .2s ease; }
+.card-hover:hover{ transform:translateY(-4px); box-shadow:0 1rem 2rem rgba(0,0,0,.08) !important; }
+.prize-first{ transform:scale(1.04); }
+.step-num{ width:56px; height:56px; }
+
+.ce-faq details{ border:1px solid #e2e8f0; border-radius:.75rem; margin-bottom:.75rem; overflow:hidden; }
+.ce-faq summary{ cursor:pointer; padding:1rem 1.25rem; font-weight:700; color:#212529; background:#f8f9fa; list-style:none; }
+.ce-faq summary::-webkit-details-marker{ display:none; }
+.ce-faq summary::after{ content:"+"; float:right; font-weight:900; }
+.ce-faq details[open] summary::after{ content:"–"; }
+.ce-faq details p{ margin:0; padding:1rem 1.25rem; color:#6c757d; }
