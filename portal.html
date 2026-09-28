@@ -1,0 +1,1221 @@
+<title>Portal de Participantes</title>
+<style>
+  :root{
+    --bg:#EEF1F5; --surface:#FFFFFF; --surface-2:#F6F8FA; --border:#DDE3E9; --border-strong:#C3CDD6;
+    --text:#182333; --text-muted:#5C6B7A; --text-faint:#8A97A3;
+    --navy:#0F1E33; --navy-2:#16283F; --navy-ink:#EAF0F6;
+    --teal:#0C6E77; --teal-2:#0F8890; --teal-soft:#E2F1F1; --teal-soft-strong:#C9E7E7;
+    --amber:#9A6300; --amber-soft:#FBEFD9;
+    --green:#186B45; --green-soft:#DEF2E7;
+    --red:#B23A26; --red-soft:#FBE8E3;
+    --blue:#1D5FAE; --blue-soft:#E3ECF9;
+    --purple:#7A3FA0; --purple-soft:#F1E6F7;
+    --focus:#0C6E77;
+    --r-sm:8px; --r-md:12px; --r-lg:18px;
+    --shadow-sm:0 1px 2px rgba(15,30,51,.07);
+    --shadow-md:0 10px 30px -12px rgba(15,30,51,.22);
+    --sidebar-w:240px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1420; --surface:#121E2E; --surface-2:#182636; --border:#26374B; --border-strong:#324A63;
+      --text:#E7EDF4; --text-muted:#96A6B8; --text-faint:#6E8094;
+      --navy:#080E18; --navy-2:#0D1826; --navy-ink:#EAF0F6;
+      --teal:#3FB6BC; --teal-2:#57C8CD; --teal-soft:#123236; --teal-soft-strong:#164047;
+      --amber:#E3B24D; --amber-soft:#3A2E10;
+      --green:#5FCB93; --green-soft:#123322;
+      --red:#F0806A; --red-soft:#3A1712;
+      --blue:#7EB2F0; --blue-soft:#122538;
+      --purple:#C79CE0; --purple-soft:#291B36;
+      --focus:#57C8CD;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.35); --shadow-md:0 14px 36px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1420; --surface:#121E2E; --surface-2:#182636; --border:#26374B; --border-strong:#324A63;
+    --text:#E7EDF4; --text-muted:#96A6B8; --text-faint:#6E8094;
+    --navy:#080E18; --navy-2:#0D1826; --navy-ink:#EAF0F6;
+    --teal:#3FB6BC; --teal-2:#57C8CD; --teal-soft:#123236; --teal-soft-strong:#164047;
+    --amber:#E3B24D; --amber-soft:#3A2E10;
+    --green:#5FCB93; --green-soft:#123322;
+    --red:#F0806A; --red-soft:#3A1712;
+    --blue:#7EB2F0; --blue-soft:#122538;
+    --purple:#C79CE0; --purple-soft:#291B36;
+    --focus:#57C8CD;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35); --shadow-md:0 14px 36px -14px rgba(0,0,0,.6);
+  }
+
+  *{ box-sizing:border-box; }
+  body{ background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3{ text-wrap:balance; margin:0; }
+  .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; border-radius:4px; }
+  .icon{ width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:inline-block; vertical-align:-0.15em; flex-shrink:0; }
+  [hidden]{ display:none!important; }
+
+  /* ===================== LOGIN ===================== */
+  #view-login{ min-height:100vh; min-height:100svh; display:grid; grid-template-columns:1.1fr 1fr; background:var(--bg); }
+  @media (max-width:840px){ #view-login{ grid-template-columns:1fr; } .login-brand{ min-height:220px; } }
+  .login-brand{
+    background:radial-gradient(120% 140% at 15% 0%, #163650 0%, var(--navy) 55%, var(--navy-2) 100%);
+    color:var(--navy-ink); padding:48px 44px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;
+  }
+  .login-brand::after{
+    content:""; position:absolute; right:-90px; bottom:-90px; width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(63,182,188,.28), transparent 70%);
+  }
+  .login-mark{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; letter-spacing:.2px; position:relative; z-index:1; }
+  .login-mark .mark{ width:34px; height:34px; border-radius:9px; background:var(--teal-2); color:var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
+  .login-hero{ position:relative; z-index:1; max-width:30ch; }
+  .login-hero .eyebrow{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7FD3D6; margin-bottom:10px; }
+  .login-hero h1{ font-size:clamp(26px,3.6vw,34px); font-weight:700; line-height:1.15; }
+  .login-hero p{ margin:14px 0 0; color:#B9C7D6; font-size:14px; line-height:1.6; max-width:38ch; }
+  .login-stats{ display:flex; gap:26px; position:relative; z-index:1; }
+  .login-stats div b{ display:block; font-size:22px; font-weight:700; font-family:"IBM Plex Mono",monospace; }
+  .login-stats div span{ font-size:11.5px; color:#8FA3B8; }
+
+  .login-panel{ display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+  .login-card{ width:100%; max-width:380px; }
+  .login-card h2{ font-size:21px; font-weight:700; }
+  .login-card > p{ margin:8px 0 28px; color:var(--text-muted); font-size:13.5px; line-height:1.55; }
+  .google-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:12px 18px; border-radius:999px;
+    border:1px solid var(--border-strong); background:var(--surface); color:var(--text); font-size:14px; font-weight:600; cursor:pointer;
+    box-shadow:var(--shadow-sm); transition:box-shadow .15s ease, transform .05s ease;
+  }
+  .google-btn:hover{ box-shadow:var(--shadow-md); }
+  .google-btn:active{ transform:translateY(1px); }
+  .google-btn[disabled]{ opacity:.7; cursor:wait; }
+  .google-spin{ width:16px; height:16px; border-radius:50%; border:2px solid var(--border-strong); border-top-color:var(--teal); animation:spin .7s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .login-note{ display:flex; gap:10px; padding:12px 14px; border-radius:var(--r-md); background:var(--teal-soft); border:1px solid var(--teal-soft-strong); font-size:12px; color:var(--text); line-height:1.5; }
+  .login-note .icon{ color:var(--teal); flex:0 0 auto; margin-top:1px; }
+  .login-foot{ margin-top:26px; font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+  .login-foot a{ color:var(--teal); text-decoration:none; font-weight:600; }
+
+  /* ===================== APP SHELL ===================== */
+  .shell{ display:flex; min-height:100vh; min-height:100svh; }
+  .overlay{ position:fixed; inset:0; background:rgba(8,14,24,.5); z-index:30; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+
+  .sidebar{ width:var(--sidebar-w); flex:0 0 auto; background:var(--navy); color:var(--navy-ink); display:flex; flex-direction:column; position:sticky; top:0; align-self:flex-start; height:100vh; height:100svh; z-index:40; }
+  .brand{ display:flex; align-items:center; gap:10px; padding:20px 20px 16px; font-weight:700; font-size:16px; border-bottom:1px solid rgba(255,255,255,.08); }
+  .brand .mark{ width:32px; height:32px; border-radius:9px; background:var(--teal-2); color:var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; }
+  .brand small{ display:block; font-weight:400; font-size:10.5px; color:#9DB0C4; letter-spacing:.3px; }
+  .sidebar-close{ display:none; margin-left:auto; background:transparent; border:0; color:#9FB1C4; cursor:pointer; }
+
+  .nav{ flex:1; overflow-y:auto; padding:14px 10px; display:flex; flex-direction:column; gap:2px; }
+  .nav a{ display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:var(--r-sm); color:#C4D3E2; font-size:13.5px; font-weight:600; text-decoration:none; border-left:2px solid transparent; }
+  .nav a .icon{ color:#7C93AA; }
+  .nav a:hover{ background:rgba(255,255,255,.06); color:#fff; }
+  .nav a.active{ background:rgba(63,182,188,.14); color:#fff; border-left-color:var(--teal-2); }
+  .nav a.active .icon{ color:var(--teal-2); }
+  .nav-cta{ margin:6px 2px 0; padding:11px 12px; border-radius:var(--r-sm); background:var(--teal); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; gap:9px; cursor:pointer; border:0; text-align:left; }
+  .nav-cta:hover{ filter:brightness(1.08); }
+
+  .sidebar-foot{ padding:14px 18px; border-top:1px solid rgba(255,255,255,.08); font-size:11px; color:#6E8094; line-height:1.5; }
+
+  .main{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; }
+  .topbar{ position:sticky; top:0; z-index:20; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; padding:12px 22px; }
+  .burger{ display:none; width:36px; height:36px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface); align-items:center; justify-content:center; cursor:pointer; color:var(--text); }
+  .crumb{ font-size:12px; color:var(--text-faint); }
+  .topbar-title{ font-size:15.5px; font-weight:700; }
+  .topbar-spacer{ flex:1; }
+  .contest-pill{ display:flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px; background:var(--teal-soft); color:var(--teal); font-size:12px; font-weight:700; }
+  .contest-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 3px var(--teal-soft-strong); }
+  .user-chip{ display:flex; align-items:center; gap:9px; padding:5px 10px 5px 5px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); }
+  .avatar{ width:28px; height:28px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; flex:0 0 auto; }
+  .user-chip .name{ font-size:12.5px; font-weight:600; line-height:1.1; }
+  .user-chip .role{ font-size:10.5px; color:var(--text-faint); line-height:1.1; }
+  .logout-btn{ display:flex; align-items:center; gap:6px; padding:8px 13px; border-radius:999px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-muted); font-weight:600; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  .logout-btn:hover{ background:var(--red-soft); color:var(--red); border-color:transparent; }
+
+  .content{ padding:24px; flex:1; max-width:1160px; width:100%; margin:0 auto; }
+  .page-head{ margin-bottom:18px; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .page-head h1{ font-size:22px; font-weight:700; }
+  .page-head p{ margin:5px 0 0; color:var(--text-muted); font-size:13.5px; max-width:60ch; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); margin-bottom:16px; overflow:hidden; }
+  .card-head{ display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+  .card-head .icon-badge{ width:26px; height:26px; border-radius:8px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; }
+  .card-head h2{ font-size:13.5px; font-weight:700; }
+  .card-head .hint{ margin-left:auto; font-size:12px; color:var(--text-faint); }
+  .card-body{ padding:20px; }
+
+  /* form controls */
+  .field{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .field label{ font-size:12.5px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
+  .field label .req{ color:var(--red); }
+  .ctrl{ position:relative; display:flex; align-items:center; }
+  .ctrl .icon{ position:absolute; left:11px; color:var(--text-faint); pointer-events:none; }
+  input[type=text], input[type=tel], input[type=email], select{
+    width:100%; font-size:13.5px; color:var(--text); background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:var(--r-sm); padding:9px 12px; font-family:inherit; transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .ctrl.has-icon input, .ctrl.has-icon select{ padding-left:34px; }
+  input::placeholder{ color:var(--text-faint); }
+  input:focus, select:focus{ border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); outline:none; }
+  select{ appearance:none; -webkit-appearance:none; background-image:none; padding-right:32px; cursor:pointer; }
+  .ctrl.select::after{ content:""; position:absolute; right:12px; width:9px; height:9px; border-right:1.6px solid var(--text-faint); border-bottom:1.6px solid var(--text-faint); transform:rotate(45deg) translateY(-50%); pointer-events:none; top:50%; margin-top:-4px; }
+  .field.invalid input, .field.invalid select{ border-color:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
+  .field-error{ font-size:11.5px; color:var(--red); display:none; }
+  .field.invalid .field-error{ display:block; }
+
+  .grid{ display:grid; gap:16px; }
+  .grid.cols-3{ grid-template-columns:repeat(3,1fr); }
+  .grid.cols-2{ grid-template-columns:repeat(2,1fr); }
+  @media (max-width:820px){ .grid.cols-3{ grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .grid.cols-3, .grid.cols-2{ grid-template-columns:1fr; } }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; font-size:13px; font-weight:600; padding:9px 16px; border-radius:var(--r-sm); border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:filter .12s ease, background .12s ease, transform .05s ease; }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--teal); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{ background:var(--surface); color:var(--text); border-color:var(--border-strong); }
+  .btn-ghost:hover{ background:var(--surface-2); }
+  .btn-sm{ padding:7px 12px; font-size:12.5px; }
+  .btn[disabled]{ opacity:.45; cursor:not-allowed; pointer-events:none; }
+  .actions-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+
+  .badge{ display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; }
+  .badge-green{ background:var(--green-soft); color:var(--green); }
+  .badge-amber{ background:var(--amber-soft); color:var(--amber); }
+  .badge-teal{ background:var(--teal-soft); color:var(--teal); }
+  .badge-neutral{ background:var(--surface-2); color:var(--text-muted); border:1px solid var(--border); }
+
+  /* dashboard */
+  .kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:18px; }
+  .kpi-tile{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 18px; box-shadow:var(--shadow-sm); }
+  .kpi-label{ font-size:11.5px; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:6px; }
+  .kpi-label .icon{ color:var(--teal); }
+  .kpi-value{ font-size:28px; font-weight:700; margin-top:6px; font-family:"IBM Plex Mono",monospace; }
+
+  .deadline-banner{ display:flex; align-items:center; gap:14px; padding:16px 20px; border-radius:var(--r-lg); background:linear-gradient(120deg,var(--navy),var(--navy-2)); color:var(--navy-ink); margin-bottom:18px; }
+  .deadline-banner .icon-wrap{ width:38px; height:38px; border-radius:10px; background:rgba(63,182,188,.18); color:var(--teal-2); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .deadline-banner b{ display:block; font-size:14px; }
+  .deadline-banner span{ font-size:12px; color:#9FB1C4; }
+  .deadline-banner .topbar-spacer{ flex:1; }
+
+  /* ficha cards */
+  .ficha-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+  .ficha-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .ficha-card .fc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .ficha-card .fc-title{ font-size:15px; font-weight:700; }
+  .ficha-card .fc-code{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+  .ficha-card .fc-meta{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--text-muted); }
+  .ficha-card .fc-meta .row{ display:flex; align-items:center; gap:7px; }
+  .ficha-card .fc-meta .icon{ color:var(--text-faint); flex:0 0 auto; }
+  .ficha-card .fc-actions{ display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
+  .preview-tag{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; border:1px dashed var(--border-strong); color:var(--text-faint); font-size:10.5px; font-weight:600; }
+
+  /* reuse chooser */
+  .choice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .choice-grid{ grid-template-columns:1fr; } }
+  .choice-card{ border:1.5px solid var(--border-strong); border-radius:var(--r-md); padding:18px; cursor:pointer; text-align:left; background:var(--surface); }
+  .choice-card:hover{ border-color:var(--teal); background:var(--teal-soft); }
+  .choice-card .icon-wrap{ width:34px; height:34px; border-radius:9px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+  .choice-card b{ display:block; font-size:13.5px; }
+  .choice-card span{ display:block; font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.5; }
+  .reuse-note{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:var(--r-md); background:var(--teal-soft); border:1px solid var(--teal-soft-strong); font-size:12.5px; color:var(--text); margin-bottom:16px; }
+  .reuse-note .icon{ color:var(--teal); flex:0 0 auto; }
+  .reuse-note b{ font-weight:700; }
+
+  /* wizard */
+  .wizard{ display:grid; grid-template-columns:210px 1fr; gap:20px; align-items:start; }
+  @media (max-width:860px){ .wizard{ grid-template-columns:1fr; } }
+  .steps{ position:sticky; top:76px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:10px; box-shadow:var(--shadow-sm); }
+  @media (max-width:860px){ .steps{ position:static; flex-direction:row; overflow-x:auto; } }
+  .step-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm); cursor:pointer; border:0; background:transparent; text-align:left; width:100%; color:var(--text-muted); }
+  @media (max-width:860px){ .step-item{ width:auto; white-space:nowrap; } }
+  .step-item:hover{ background:var(--surface-2); }
+  .step-num{ width:23px; height:23px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border-strong); color:var(--text-faint); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .step-item.current{ background:var(--teal-soft); color:var(--teal); }
+  .step-item.current .step-num{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .step-item.done .step-num{ background:var(--green); border-color:var(--green); color:#fff; }
+  .step-item.done{ color:var(--text); }
+  .step-label{ font-size:12.5px; font-weight:600; line-height:1.2; }
+
+  .step-panel{ display:none; }
+  .step-panel.active{ display:block; animation:fade .18s ease; }
+  @keyframes fade{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .wizard-nav{ display:flex; align-items:center; gap:10px; padding-top:18px; margin-top:4px; border-top:1px solid var(--border); }
+  .wizard-nav .topbar-spacer{ flex:1; }
+  .req-legend{ font-size:11.5px; color:var(--text-faint); }
+  .req-legend .req{ color:var(--red); }
+
+  .participant-card{ border:1px solid var(--border); border-radius:var(--r-md); padding:16px; margin-bottom:14px; background:var(--surface-2); }
+  .participant-card-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:12.5px; font-weight:700; color:var(--text-muted); }
+  .participant-card-head .icon{ color:var(--purple); }
+
+  .entero-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .entero-row:last-child{ border-bottom:0; }
+  .entero-row label.chk{ display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600; min-width:250px; flex:0 0 auto; }
+  .entero-row input[type=checkbox]{ width:16px; height:16px; accent-color:var(--teal); flex:0 0 auto; }
+  .entero-row input[type=text]{ flex:1; }
+  @media (max-width:640px){ .entero-row{ flex-direction:column; align-items:stretch; gap:6px; } .entero-row label.chk{ min-width:0; } }
+
+  .review-group{ margin-bottom:14px; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
+  .review-group-head{ display:flex; align-items:center; padding:10px 14px; background:var(--surface-2); font-size:12.5px; font-weight:700; color:var(--text-muted); }
+  .review-group-head button{ margin-left:auto; }
+  .review-list{ display:grid; grid-template-columns:1fr 1fr; }
+  @media (max-width:640px){ .review-list{ grid-template-columns:1fr; } }
+  .review-item{ padding:10px 14px; border-top:1px solid var(--border); }
+  .review-item dt{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.3px; }
+  .review-item dd{ margin:2px 0 0; font-size:13px; font-weight:600; }
+
+  .success-card{ text-align:center; padding:52px 20px; }
+  .success-icon{ width:64px; height:64px; border-radius:50%; background:var(--green-soft); color:var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+  .success-icon .icon{ width:30px; height:30px; }
+  .success-code{ display:inline-block; margin-top:10px; padding:8px 16px; border-radius:999px; background:var(--teal-soft); color:var(--teal); font-weight:700; }
+
+  /* upload */
+  .dropzone{ border:2px dashed var(--border-strong); border-radius:var(--r-md); padding:34px 20px; text-align:center; cursor:pointer; background:var(--surface-2); transition:border-color .15s ease, background .15s ease; }
+  .dropzone:hover, .dropzone.drag-active{ border-color:var(--teal); background:var(--teal-soft); }
+  .dropzone input[type=file]{ display:none; }
+  .dropzone .icon{ width:28px; height:28px; color:var(--text-faint); margin-bottom:8px; }
+  .dropzone .dz-title{ font-size:13.5px; font-weight:600; }
+  .dropzone .dz-sub{ font-size:12px; color:var(--text-faint); margin-top:4px; }
+  .dropzone[data-disabled="true"]{ opacity:.5; cursor:not-allowed; pointer-events:none; }
+
+  .upload-progress{ margin-top:14px; }
+  .upload-progress .bar{ height:8px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; }
+  .upload-progress .bar > span{ display:block; height:100%; width:0%; background:var(--teal); border-radius:999px; transition:width .25s ease; }
+  .upload-progress .lbl{ font-size:11.5px; color:var(--text-muted); margin-top:6px; display:flex; justify-content:space-between; }
+
+  .ficha-preview{ display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface-2); margin-top:10px; }
+  .ficha-preview .icon-badge{ width:34px; height:34px; border-radius:9px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .ficha-preview .fp-title{ font-weight:600; font-size:13px; }
+  .ficha-preview .fp-sub{ font-size:11.5px; color:var(--text-faint); }
+  .ficha-preview .topbar-spacer{ flex:1; }
+
+  .table-scroll{ overflow-x:auto; }
+  table{ width:100%; border-collapse:collapse; min-width:460px; }
+  thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted); padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap; }
+  tbody td{ padding:11px 14px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:0; }
+  .empty-state{ padding:44px 20px; text-align:center; color:var(--text-muted); }
+  .empty-state .icon{ width:30px; height:30px; color:var(--text-faint); margin-bottom:8px; }
+
+  .toast{ position:fixed; left:50%; bottom:24px; transform:translate(-50%,12px); background:var(--navy); color:#fff; padding:12px 16px; border-radius:var(--r-md); display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-md); z-index:80; font-size:13px; opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; }
+  .toast.show{ opacity:1; pointer-events:auto; transform:translate(-50%,0); }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(8,14,24,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .15s ease; }
+  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+  .modal{ background:var(--surface); border-radius:var(--r-lg); width:100%; max-width:560px; box-shadow:var(--shadow-md); border:1px solid var(--border); transform:translateY(8px); transition:transform .15s ease; }
+  .modal-overlay.show .modal{ transform:translateY(0); }
+  .modal-head{ display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); }
+  .modal-head h2{ font-size:15px; }
+  .modal-close{ margin-left:auto; width:30px; height:30px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .modal-body{ padding:20px; }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+  .subview{ display:none; }
+  .subview.active{ display:block; }
+
+  @media (max-width:960px){
+    .sidebar{ position:fixed; left:0; top:0; transform:translateX(-100%); transition:transform .22s ease; box-shadow:var(--shadow-md); }
+    .sidebar.open{ transform:translateX(0); }
+    .burger{ display:flex; }
+    .sidebar-close{ display:flex; }
+    .content{ padding:16px; }
+    .topbar{ padding:10px 14px; }
+    .user-chip .name, .user-chip .role{ display:none; }
+    .contest-pill span{ display:none; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<svg style="display:none">
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></symbol>
+  <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-credit-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="9" y1="13" x2="9" y2="13.01"/><line x1="14" y1="9" x2="14" y2="9.01"/><line x1="14" y1="13" x2="14" y2="13.01"/><path d="M10 21v-4h4v4"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+</svg>
+
+<!-- ================= VIEW: LOGIN ================= -->
+<section id="view-login">
+  <div class="login-brand">
+    <a class="login-mark" href="index.html" style="color:inherit;text-decoration:none" title="Volver a la página del concurso"><span class="mark">BC</span> BCRP · Concurso Escolar de Videos</a>
+    <div class="login-hero">
+      <div class="eyebrow">Portal de participantes · Edición 2026</div>
+      <h1>Inscribe a tu equipo y sube tu video ganador.</h1>
+      <p>Registra los datos de tu equipo y sube tu video desde un solo lugar.</p>
+    </div>
+    <div class="login-stats">
+      <div><b class="mono">15 nov</b><span>cierre de inscripciones</span></div>
+    </div>
+  </div>
+  <div class="login-panel">
+    <div class="login-card">
+      <h2>Ingresa al portal</h2>
+      <p>Usa tu cuenta para registrar fichas y subir el video de tu equipo.</p>
+      <button class="google-btn" id="btnGoogleLogin" type="button">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+          <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+          <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+          <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+        </svg>
+        <span id="googleBtnLabel">Continuar con Google</span>
+      </button>
+      <div class="login-note" style="margin-top:22px">
+        <svg class="icon" width="16" height="16"><use href="#i-info"/></svg>
+        <div>Recuerda que el director de la institución es el único que puede registrar a los equipos participantes.</div>
+      </div>
+      <div class="login-foot">Al continuar aceptas las bases del concurso y la política de tratamiento de datos del BCRP.<br>¿Problemas para ingresar? Escribe a <a href="#" onclick="return false">concurso.escolar@bcrp.gob.pe</a> o por WhatsApp al <a href="#" onclick="return false">972 906 965</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APP SHELL ================= -->
+<div class="overlay" id="overlay"></div>
+<div class="shell" id="appShell" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="mark">BC</span>
+      <div>BCRP <small>Portal de participantes</small></div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Cerrar menú"><svg class="icon" width="18" height="18"><use href="#i-x"/></svg></button>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#inicio" data-view-link="inicio" class="active"><svg class="icon" width="17" height="17"><use href="#i-grid"/></svg> Inicio</a>
+      <a href="#fichas" data-view-link="fichas"><svg class="icon" width="17" height="17"><use href="#i-users"/></svg> Mis fichas</a>
+      <a href="#wizard" data-view-link="wizard"><svg class="icon" width="17" height="17"><use href="#i-file-text"/></svg> Registrar ficha</a>
+      <a href="#upload" data-view-link="upload"><svg class="icon" width="17" height="17"><use href="#i-upload"/></svg> Subir video</a>
+      <button class="nav-cta" id="navCta" type="button"><svg class="icon" width="15" height="15"><use href="#i-plus"/></svg> Registrar nueva ficha</button>
+    </nav>
+    <div class="sidebar-foot">Concurso Escolar de Videos BCRP · 2026<br>Inscripciones abiertas hasta el 15 de noviembre.</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" aria-label="Abrir menú"><svg class="icon" width="18" height="18"><use href="#i-menu"/></svg></button>
+      <div>
+        <div class="crumb">Portal de participantes / <b id="crumbCurrent" style="color:var(--text-muted);font-weight:600">Inicio</b></div>
+        <div class="topbar-title" id="topbarTitle">Inicio</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="contest-pill"><span class="dot"></span>Inscripciones abiertas <span>· cierra 15 nov 2026</span></div>
+      <div class="user-chip">
+        <span class="avatar" id="userAvatar">CS</span>
+        <div><div class="name" id="userName">Carmen Salazar</div><div class="role" id="userEmail">carmen.salazar@ie1154.edu.pe</div></div>
+      </div>
+      <button class="logout-btn" id="btnLogout"><svg class="icon" width="14" height="14"><use href="#i-log-out"/></svg> Salir</button>
+    </header>
+
+    <main class="content">
+
+      <!-- ===== INICIO ===== -->
+      <section class="view active" id="view-inicio">
+        <div class="deadline-banner">
+          <div class="icon-wrap"><svg class="icon" width="19" height="19"><use href="#i-clock"/></svg></div>
+          <div><b>Quedan 55 días para inscribirse</b><span>El concurso cierra el 15 de noviembre de 2026 a las 23:59 (hora Perú).</span></div>
+          <div class="topbar-spacer"></div>
+          <button class="btn btn-primary btn-sm" data-view-link="wizard" id="btnBannerNueva"><svg class="icon" width="13" height="13"><use href="#i-plus"/></svg> Registrar ficha</button>
+        </div>
+
+        <div class="page-head"><h1>Hola, Carmen</h1><p>Este es el resumen de la participación de tu institución en el concurso.</p></div>
+
+        <div class="kpi-row">
+          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-users"/></svg> Fichas registradas</div><div class="kpi-value" id="kpiFichas">1</div></div>
+          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-upload"/></svg> Videos pendientes</div><div class="kpi-value" id="kpiPendientes">1</div></div>
+          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-check-circle"/></svg> Videos subidos</div><div class="kpi-value" id="kpiSubidos">0</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-users"/></svg></span><h2>Tus fichas recientes</h2><span class="hint">Ver todas en “Mis fichas”</span></div>
+          <div class="card-body" id="inicioFichasResumen"></div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-body" style="display:flex;gap:14px;align-items:center">
+              <div class="icon-badge" style="width:40px;height:40px;border-radius:11px"><svg class="icon" width="18" height="18"><use href="#i-file-text"/></svg></div>
+              <div style="flex:1"><b style="font-size:13.5px">Registra una nueva ficha</b><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Suma otro equipo de tu colegio al concurso.</div></div>
+              <button class="btn btn-ghost btn-sm" data-view-link="wizard">Ir</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-body" style="display:flex;gap:14px;align-items:center">
+              <div class="icon-badge" style="width:40px;height:40px;border-radius:11px"><svg class="icon" width="18" height="18"><use href="#i-upload"/></svg></div>
+              <div style="flex:1"><b style="font-size:13.5px">Sube el video de tu equipo</b><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Formatos MP4, MOV o AVI.</div></div>
+              <button class="btn btn-ghost btn-sm" data-view-link="upload">Ir</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MIS FICHAS ===== -->
+      <section class="view" id="view-fichas">
+        <div class="page-head">
+          <div><h1>Mis fichas</h1><p>Fichas registradas por tu institución en el Concurso Escolar de Videos BCRP 2026.</p></div>
+          <button class="btn btn-primary" id="btnNuevaDesdeFichas"><svg class="icon" width="14" height="14"><use href="#i-plus"/></svg> Registrar nueva ficha</button>
+        </div>
+        <div class="ficha-grid" id="fichaGrid"></div>
+      </section>
+
+      <!-- ===== WIZARD: ELECCION ===== -->
+      <section class="view" id="view-wizard-choice">
+        <div class="page-head"><h1>Registrar nueva ficha</h1><p>Ya registraste datos de tu institución. Puedes reutilizarlos para inscribir a otro equipo con distinto profesor asesor, estudiantes y tema.</p></div>
+        <div class="choice-grid">
+          <button class="choice-card" id="choiceReuse" type="button">
+            <div class="icon-wrap"><svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg></div>
+            <b>Reutilizar datos del colegio</b>
+            <span>Reutiliza institución y director ya registrados. Solo completarás tema, estudiantes y profesor asesor.</span>
+          </button>
+          <button class="choice-card" id="choiceNew" type="button">
+            <div class="icon-wrap"><svg class="icon" width="16" height="16"><use href="#i-building"/></svg></div>
+            <b>Registrar institución nueva</b>
+            <span>Completa el formulario desde cero, incluyendo los datos de la institución educativa.</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== WIZARD ===== -->
+      <section class="view" id="view-wizard">
+        <div class="page-head"><h1>Registrar ficha</h1><p>Completa los datos en siete pasos. Puedes avanzar y retroceder sin perder lo escrito; los campos con <span style="color:var(--red)">*</span> son obligatorios.</p></div>
+
+        <div class="reuse-note" id="reuseNote" hidden>
+          <svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg>
+          <div><b>Usando los datos de tu colegio.</b> Institución y director se copiaron de una ficha anterior — puedes editarlos en los pasos 1 y 2 si algo cambió.</div>
+        </div>
+
+        <div class="wizard">
+          <nav class="steps" id="steps">
+            <button class="step-item current" data-step="0" type="button"><span class="step-num">1</span><span class="step-label">Institución educativa</span></button>
+            <button class="step-item" data-step="1" type="button"><span class="step-num">2</span><span class="step-label">Director</span></button>
+            <button class="step-item" data-step="2" type="button"><span class="step-num">3</span><span class="step-label">Del trabajo</span></button>
+            <button class="step-item" data-step="3" type="button"><span class="step-num">4</span><span class="step-label">Estudiantes</span></button>
+            <button class="step-item" data-step="4" type="button"><span class="step-num">5</span><span class="step-label">Profesor asesor</span></button>
+            <button class="step-item" data-step="5" type="button"><span class="step-num">6</span><span class="step-label">Cómo se enteraron</span></button>
+            <button class="step-item" data-step="6" type="button"><span class="step-num">7</span><span class="step-label">Revisar y enviar</span></button>
+          </nav>
+
+          <form class="card" id="ficha-form" novalidate>
+            <div class="card-body">
+
+              <div class="step-panel active" data-panel="0">
+                <div class="grid cols-2">
+                  <div class="field" style="grid-column:1/-1"><label>Nombre de la institución educativa <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-building"/></svg><input required id="ie-nombre" type="text" placeholder="Ej. I.E. 1154 Marcos Durán Martel"></div>
+                    <span class="field-error">Escribe el nombre de la institución.</span>
+                  </div>
+                  <div class="field" style="grid-column:1/-1"><label>Dirección <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-direccion" type="text" placeholder="Av., calle o jirón, número"></div>
+                    <span class="field-error">Escribe la dirección de la institución.</span>
+                  </div>
+                  <div class="field"><label>Región <span class="req">*</span></label>
+                    <div class="ctrl select"><select required id="ie-region"><option value="">Selecciona región</option></select></div>
+                    <span class="field-error">Selecciona la región.</span>
+                  </div>
+                  <div class="field"><label>Provincia <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-provincia" type="text" placeholder="Ej. San Martín"></div>
+                    <span class="field-error">Escribe la provincia.</span>
+                  </div>
+                  <div class="field"><label>Distrito <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-distrito" type="text" placeholder="Ej. Tarapoto"></div>
+                    <span class="field-error">Escribe el distrito.</span>
+                  </div>
+                  <div class="field"><label>Teléfono <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="ie-telefono" type="tel" placeholder="01 234 5678"></div>
+                    <span class="field-error">Ingresa un teléfono de contacto.</span>
+                  </div>
+                  <div class="field" style="grid-column:1/-1"><label>Correo institucional <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="ie-correo" type="email" placeholder="contacto@institucion.edu.pe"></div>
+                    <span class="field-error">Ingresa un correo válido.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="1">
+                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos de la persona que dirige la institución educativa.</p>
+                <div class="grid cols-3">
+                  <div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="d-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>
+                  <div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="d-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="d-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field" style="grid-column:1/-1"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="d-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="2">
+                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos del video que presenta el equipo.</p>
+                <div class="grid cols-2">
+                  <div class="field" style="grid-column:1/-1"><label>Tema <span class="req">*</span></label>
+                    <div class="ctrl select"><select required id="w-tema">
+                      <option value="">Selecciona un tema…</option>
+                      <option>Metas de inflación</option><option>Pagos digitales</option><option>Reservas internacionales</option><option>Dolarización</option><option>Billetes y monedas</option>
+                    </select></div>
+                    <span class="field-error">Selecciona el tema del video.</span>
+                  </div>
+                  <div class="field" style="grid-column:1/-1"><label>Título <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-video"/></svg><input required id="w-titulo" type="text" placeholder="Título tal como aparece en el video" maxlength="120"></div>
+                    <span class="field-error">Escribe el título del video.</span>
+                  </div>
+                  <div class="field" style="grid-column:1/-1"><label>Seudónimo del equipo <span class="req">*</span></label>
+                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-tag"/></svg><input required id="w-seudonimo" type="text" placeholder="Nombre con el que se identificará el equipo" maxlength="40"></div>
+                    <span class="field-error">Escribe el seudónimo del equipo.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="3">
+                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">El equipo participa con 3 estudiantes.</p>
+                <div id="participantesList"></div>
+              </div>
+
+              <div class="step-panel" data-panel="4">
+                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos del profesor que asesora al equipo participante.</p>
+                <div class="reuse-note" id="profReuseNote" style="align-items:flex-start" hidden>
+                  <svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg>
+                  <div style="flex:1">
+                    <b>¿Es el mismo profesor asesor de otra ficha?</b> Es opcional: si quieres, reutiliza sus datos en vez de escribirlos de nuevo.
+                    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+                      <div class="ctrl select" style="min-width:240px;flex:1"><select id="profReuseSelect"></select></div>
+                      <button type="button" class="btn btn-ghost btn-sm" id="btnUseProfReuse">Usar estos datos</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid cols-3">
+                  <div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="p-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>
+                  <div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="p-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="p-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field" style="grid-column:span 2"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="p-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>
+                  <div class="field"><label>Especialidad <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-award"/></svg><input required id="p-especialidad" type="text" placeholder="Ej. Educación secundaria - Comunicación"></div><span class="field-error">Campo obligatorio.</span></div>
+                  <div class="field" style="grid-column:1/-1"><label>Cursos que dicta <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-file-text"/></svg><input required id="p-cursos" type="text" placeholder="Ej. Comunicación, Arte y cultura"></div><span class="field-error">Campo obligatorio.</span></div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="5">
+                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Marca todos los medios por los que se enteraron del concurso; el detalle es opcional.</p>
+                <div id="enteraronList"></div>
+              </div>
+
+              <div class="step-panel" data-panel="6">
+                <div id="reviewArea"></div>
+              </div>
+
+            </div>
+            <div class="card-body" style="padding-top:0">
+              <div class="wizard-nav">
+                <button type="button" class="btn btn-ghost" id="btnPrev" disabled><svg class="icon" width="14" height="14"><use href="#i-arrow-left"/></svg> Anterior</button>
+                <span class="req-legend"><span class="req">*</span> obligatorio</span>
+                <div class="topbar-spacer"></div>
+                <button type="button" class="btn btn-primary" id="btnNext">Siguiente <svg class="icon" width="14" height="14"><use href="#i-arrow-right"/></svg></button>
+                <button type="submit" class="btn btn-primary" id="btnSubmit" hidden><svg class="icon" width="14" height="14"><use href="#i-check"/></svg> Enviar ficha</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===== SUCCESS ===== -->
+      <section class="view" id="view-success">
+        <div class="card success-card">
+          <div class="success-icon"><svg class="icon" width="30" height="30"><use href="#i-check-circle"/></svg></div>
+          <h2 style="font-size:19px">¡Ficha registrada con éxito!</h2>
+          <p style="color:var(--text-muted);font-size:13.5px;max-width:46ch;margin:8px auto 0">Guarda el código de tu ficha: lo necesitarás para subir el video y para hacer seguimiento a tu inscripción.</p>
+          <div class="success-code mono" id="successCode">CE-2026-0000-000000</div>
+          <div class="actions-row" style="justify-content:center;margin-top:22px">
+            <button class="btn btn-ghost" id="btnAnother">Registrar otra ficha</button>
+            <button class="btn btn-ghost" id="btnToList">Ver mis fichas</button>
+            <button class="btn btn-primary" id="btnGoUpload"><svg class="icon" width="14" height="14"><use href="#i-upload"/></svg> Subir video ahora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SUBIR VIDEO ===== -->
+      <section class="view" id="view-upload">
+        <div class="page-head"><h1>Subir video</h1><p>Sube el video correspondiente a una de tus fichas ya registradas.</p></div>
+
+        <div class="card">
+          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-file-text"/></svg></span><h2>Elegir ficha</h2></div>
+          <div class="card-body">
+            <div class="field" style="max-width:440px">
+              <label>Ficha <span class="req">*</span></label>
+              <div class="ctrl select"><select id="up-ficha"></select></div>
+            </div>
+            <div id="up-preview"></div>
+
+            <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);margin:20px 0 10px">Archivo de video</div>
+            <div class="dropzone" id="up-dropzone">
+              <svg class="icon" width="28" height="28"><use href="#i-upload"/></svg>
+              <div class="dz-title" id="up-dz-title">Arrastra el video aquí o haz clic para elegirlo</div>
+              <div class="dz-sub" id="up-file-name">Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB</div>
+              <input type="file" id="up-file" accept="video/*">
+            </div>
+            <div class="upload-progress" id="up-progress" hidden>
+              <div class="bar"><span id="up-progress-bar"></span></div>
+              <div class="lbl"><span id="up-progress-text">Subiendo…</span><span id="up-progress-pct">0%</span></div>
+            </div>
+
+            <div class="actions-row">
+              <button type="button" class="btn btn-primary" id="btnSubirVideo"><svg class="icon" width="14" height="14"><use href="#i-upload"/></svg> Subir video</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-clock"/></svg></span><h2>Subidas recientes</h2></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Ficha</th><th>Archivo</th><th>Hora</th></tr></thead>
+              <tbody id="uploadLogBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="uploadLogEmpty">
+            <svg class="icon" width="30" height="30"><use href="#i-inbox"/></svg>
+            <div>Aún no subes archivos en esta sesión.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head"><h2>Ficha registrada</h2><button class="modal-close" id="modalClose" type="button"><svg class="icon" width="16" height="16"><use href="#i-x"/></svg></button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  function $(sel,root){ return (root||document).querySelector(sel); }
+  function $all(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+  var REGIONES = ["Amazonas","Áncash","Apurímac","Arequipa","Ayacucho","Cajamarca","Callao","Cusco","Huancavelica","Huánuco","Ica","Junín","La Libertad","Lambayeque","Lima","Loreto","Madre de Dios","Moquegua","Pasco","Piura","Puno","San Martín","Tacna","Tumbes","Ucayali"];
+  var GRADOS = ["1° de secundaria","2° de secundaria","3° de secundaria","4° de secundaria","5° de secundaria"];
+  var ENTERARON_OPCIONES = [
+    {label:"Web", detalle:"¿Cuál sitio?"},
+    {label:"Periódico o revista", detalle:"¿Cuál?"},
+    {label:"Televisión", detalle:"¿Cuál programa?"},
+    {label:"Radio", detalle:"¿Cuál emisora?"},
+    {label:"UGEL", detalle:"¿Cuál Ugel?"},
+    {label:"Otro", detalle:"(Opcional)"},
+    {label:"Teléfono", detalle:"(Opcional)"},
+    {label:"WhatsApp", detalle:"¿Cuál es tu WhatsApp?"},
+    {label:"Colegio", detalle:"Lugar, medio"},
+    {label:"Facebook", detalle:"¿Cuál página?"},
+    {label:"X (Twitter)", detalle:"¿Cuál cuenta?"},
+    {label:"YouTube", detalle:"¿Cuál canal?"},
+    {label:"Instagram", detalle:"¿Cuál canal?"},
+    {label:"TikTok", detalle:"¿Cuál canal?"},
+    {label:"Correo", detalle:"¿Remitente?"}
+  ];
+
+  var USER = { name:"Carmen Salazar", email:"carmen.salazar@ie1154.edu.pe", initials:"CS" };
+
+  var fichas = [{
+    id:1,
+    codigo:"CE-2026-1154-030815-58204",
+    preview:true,
+    colegio:{ nombre:"I.E. 1154 Marcos Durán Martel", direccion:"Jr. Los Robles 482", region:"Lima", provincia:"Lima", distrito:"San Juan de Lurigancho", telefono:"01 456 7890", correo:"contacto@ie1154.edu.pe" },
+    director:{ appat:"Vargas", apmat:"Ochoa", nombres:"Luis Alberto", tipodoc:"DNI", numdoc:"10458732", telefono:"987 112 233", correo:"director@ie1154.edu.pe" },
+    trabajo:{ tema:"Billetes y monedas", titulo:"El valor detrás del billete", seudonimo:"Los Guardianes del Sol" },
+    estudiantes:[
+      {appat:"Quiroz", apmat:"Fernández", nombres:"Ariana Sofía", tipodoc:"DNI", numdoc:"78541236", grado:"4° de secundaria", telefono:"956 214 778", correo:"ariana.qf@example.com"},
+      {appat:"Ramos", apmat:"Delgado", nombres:"Mateo Iker", tipodoc:"DNI", numdoc:"79632145", grado:"4° de secundaria", telefono:"944 331 220", correo:"mateo.rd@example.com"},
+      {appat:"Huamán", apmat:"Torres", nombres:"Valentina", tipodoc:"DNI", numdoc:"80147523", grado:"4° de secundaria", telefono:"923 887 410", correo:"valentina.ht@example.com"}
+    ],
+    profesor:{ appat:"Salazar", apmat:"Ponce", nombres:"Carmen Rosa", tipodoc:"DNI", numdoc:"41236598", telefono:"944 552 118", correo:"carmen.salazar@ie1154.edu.pe", especialidad:"Educación secundaria - Comunicación", cursos:"Comunicación, Arte y cultura" },
+    entero:["Facebook"],
+    videoStatus:"pendiente",
+    createdAt:"12 sep 2026 · 10:32 a. m."
+  }];
+  var nextFichaId = 2;
+  var uploads = [];
+
+  var FORM_SETTINGS = { numEstudiantes: 3 };
+  var participantIds = [1,2,3];
+  var reuseSource = null; // ficha whose colegio/director data is reused
+  var wizardStep = 0;
+  var STEP_COUNT = 7;
+
+  /* ---------------- Login ---------------- */
+  var btnGoogleLogin = $("#btnGoogleLogin");
+  btnGoogleLogin.addEventListener("click", function(){
+    btnGoogleLogin.disabled = true;
+    $("#googleBtnLabel").textContent = "Conectando con Google…";
+    var spin = document.createElement("span");
+    spin.className = "google-spin";
+    btnGoogleLogin.insertBefore(spin, btnGoogleLogin.firstChild);
+    setTimeout(function(){
+      $("#view-login").hidden = true;
+      $("#appShell").hidden = false;
+      $("#userAvatar").textContent = USER.initials;
+      $("#userName").textContent = USER.name;
+      $("#userEmail").textContent = USER.email;
+      switchView("inicio");
+      renderAll();
+    }, 900);
+  });
+
+  $("#btnLogout").addEventListener("click", function(){
+    $("#appShell").hidden = true;
+    $("#view-login").hidden = false;
+    btnGoogleLogin.disabled = false;
+    $("#googleBtnLabel").textContent = "Continuar con Google";
+    var spin = $(".google-spin"); if(spin) spin.remove();
+  });
+
+  /* ---------------- Nav / views ---------------- */
+  var sidebar = $("#sidebar"), overlay = $("#overlay");
+  function openSidebar(){ sidebar.classList.add("open"); overlay.classList.add("show"); }
+  function closeSidebar(){ sidebar.classList.remove("open"); overlay.classList.remove("show"); }
+  $("#burger").addEventListener("click", openSidebar);
+  $("#sidebarClose").addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  var VIEW_TITLES = { inicio:"Inicio", fichas:"Mis fichas", wizard:"Registrar ficha", upload:"Subir video" };
+  function switchView(name){
+    $all(".view").forEach(function(v){ v.classList.remove("active"); });
+    var target = name === "wizard-choice" ? "wizard-choice" : name;
+    var el = $("#view-"+target);
+    if(el) el.classList.add("active");
+    $all(".nav a").forEach(function(a){ a.classList.toggle("active", a.dataset.viewLink === name); });
+    var title = VIEW_TITLES[name] || VIEW_TITLES[name.split("-")[0]] || "Portal";
+    $("#topbarTitle").textContent = title;
+    $("#crumbCurrent").textContent = title;
+    closeSidebar();
+    window.scrollTo(0,0);
+  }
+  $all("[data-view-link]").forEach(function(el){
+    el.addEventListener("click", function(e){
+      e.preventDefault();
+      var name = el.dataset.viewLink;
+      if(name === "wizard"){ startNuevaFicha(); return; }
+      switchView(name);
+    });
+  });
+
+  function startNuevaFicha(){
+    if(fichas.length > 0){
+      switchView("wizard-choice");
+    } else {
+      openWizard(null);
+    }
+  }
+  $("#navCta").addEventListener("click", startNuevaFicha);
+  $("#btnNuevaDesdeFichas").addEventListener("click", startNuevaFicha);
+  $("#choiceNew").addEventListener("click", function(){ openWizard(null); });
+  $("#choiceReuse").addEventListener("click", function(){ openWizard(fichas[fichas.length-1]); });
+
+  /* ---------------- Dashboard ---------------- */
+  function renderInicio(){
+    $("#kpiFichas").textContent = fichas.length;
+    $("#kpiPendientes").textContent = fichas.filter(function(f){ return f.videoStatus!=="subido"; }).length;
+    $("#kpiSubidos").textContent = fichas.filter(function(f){ return f.videoStatus==="subido"; }).length;
+    var wrap = $("#inicioFichasResumen");
+    if(fichas.length===0){
+      wrap.innerHTML = '<div class="empty-state"><svg class="icon" width="30" height="30"><use href="#i-users"/></svg><div>Aún no registras ninguna ficha.</div></div>';
+      return;
+    }
+    wrap.innerHTML = fichas.slice(0,3).map(function(f){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">' +
+        '<div class="icon-badge" style="width:34px;height:34px;border-radius:9px"><svg class="icon" width="15" height="15"><use href="#i-video"/></svg></div>' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+esc(f.trabajo.seudonimo)+'</div><div class="mono" style="font-size:11px;color:var(--text-faint)">'+esc(f.codigo)+'</div></div>' +
+        statusBadge(f.videoStatus) +
+      '</div>';
+    }).join("").replace(/border-bottom:1px solid var\(--border\)"(?=[^>]*$)/,'border-bottom:0"');
+  }
+
+  function statusBadge(status){
+    return status==="subido"
+      ? '<span class="badge badge-green"><svg class="icon" width="11" height="11"><use href="#i-check-circle"/></svg> Video subido</span>'
+      : '<span class="badge badge-amber"><svg class="icon" width="11" height="11"><use href="#i-clock"/></svg> Pendiente de subir</span>';
+  }
+
+  /* ---------------- Mis fichas ---------------- */
+  function renderFichaGrid(){
+    var grid = $("#fichaGrid");
+    if(fichas.length===0){
+      grid.innerHTML = '<div class="card"><div class="empty-state"><svg class="icon" width="30" height="30"><use href="#i-users"/></svg><div>Aún no registras ninguna ficha. Usa “Registrar nueva ficha” para empezar.</div></div></div>';
+      return;
+    }
+    grid.innerHTML = fichas.map(function(f){
+      return '<div class="ficha-card">' +
+        '<div class="fc-top"><div><div class="fc-title">'+esc(f.trabajo.seudonimo)+'</div><div class="fc-code mono">'+esc(f.codigo)+'</div></div>' + statusBadge(f.videoStatus) + '</div>' +
+        (f.preview ? '<span class="preview-tag"><svg class="icon" width="10" height="10"><use href="#i-info"/></svg> Datos de ejemplo</span>' : '') +
+        '<div class="fc-meta">' +
+          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-tag"/></svg>'+esc(f.trabajo.tema)+'</div>' +
+          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-award"/></svg>Prof. '+esc(f.profesor.nombres+" "+f.profesor.appat)+'</div>' +
+          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-users"/></svg>'+f.estudiantes.length+' estudiantes</div>' +
+          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-clock"/></svg>Registrada el '+esc(f.createdAt)+'</div>' +
+        '</div>' +
+        '<div class="fc-actions">' +
+          '<button class="btn btn-ghost btn-sm" data-reuse="'+f.id+'"><svg class="icon" width="12" height="12"><use href="#i-repeat"/></svg> Reutilizar datos</button>' +
+          '<button class="btn btn-primary btn-sm" data-upload-for="'+f.id+'"><svg class="icon" width="12" height="12"><use href="#i-upload"/></svg> Subir video</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    $all("[data-reuse]", grid).forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var f = fichas.find(function(x){ return x.id===parseInt(btn.dataset.reuse,10); });
+        openWizard(f);
+      });
+    });
+    $all("[data-upload-for]", grid).forEach(function(btn){
+      btn.addEventListener("click", function(){
+        switchView("upload");
+        $("#up-ficha").value = btn.dataset.uploadFor;
+        renderUploadPreview();
+      });
+    });
+  }
+
+  /* ---------------- Wizard ---------------- */
+  var panels = $all(".step-panel");
+  var stepItems = $all(".step-item");
+
+  function populateRegiones(){
+    var sel = $("#ie-region");
+    sel.innerHTML = '<option value="">Selecciona región</option>' + REGIONES.map(function(r){ return "<option>"+r+"</option>"; }).join("");
+  }
+
+  function openWizard(reuse){
+    reuseSource = reuse || null;
+    $("#ficha-form").reset();
+    $all(".field").forEach(function(f){ f.classList.remove("invalid"); });
+    populateRegiones();
+    renderParticipantes();
+    renderEnteraron();
+    renderProfReuseOptions();
+    wizardStep = reuse ? 2 : 0;
+    if(reuse){
+      $("#ie-nombre").value = reuse.colegio.nombre;
+      $("#ie-direccion").value = reuse.colegio.direccion;
+      $("#ie-region").value = reuse.colegio.region;
+      $("#ie-provincia").value = reuse.colegio.provincia;
+      $("#ie-distrito").value = reuse.colegio.distrito;
+      $("#ie-telefono").value = reuse.colegio.telefono;
+      $("#ie-correo").value = reuse.colegio.correo;
+      $("#d-appat").value = reuse.director.appat;
+      $("#d-apmat").value = reuse.director.apmat;
+      $("#d-nombres").value = reuse.director.nombres;
+      $("#d-tipodoc").value = reuse.director.tipodoc;
+      $("#d-numdoc").value = reuse.director.numdoc;
+      $("#d-telefono").value = reuse.director.telefono;
+      $("#d-correo").value = reuse.director.correo;
+      $("#reuseNote").hidden = false;
+    } else {
+      $("#reuseNote").hidden = true;
+    }
+    stepItems.forEach(function(it,i){ it.classList.toggle("done", reuse ? i<2 : false); });
+    goStep(wizardStep);
+    switchView("wizard");
+  }
+
+  function fieldsInPanel(i){
+    return $all("input[required], select[required]", panels[i]);
+  }
+  function validatePanel(i){
+    var ok = true;
+    fieldsInPanel(i).forEach(function(inp){
+      var field = inp.closest(".field");
+      var valid = inp.value && inp.value.trim().length>0;
+      if(inp.type==="email" && valid){ valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value); }
+      field.classList.toggle("invalid", !valid);
+      if(!valid) ok = false;
+    });
+    return ok;
+  }
+
+  function goStep(i){
+    wizardStep = Math.max(0, Math.min(STEP_COUNT-1, i));
+    panels.forEach(function(p,idx){ p.classList.toggle("active", idx===wizardStep); });
+    stepItems.forEach(function(it,idx){
+      it.classList.toggle("current", idx===wizardStep);
+      if(idx < wizardStep) it.classList.add("done");
+      if(idx > wizardStep && !(reuseSource && idx<2)) it.classList.remove("done");
+    });
+    $("#btnPrev").disabled = wizardStep===0;
+    var isLast = wizardStep === STEP_COUNT-1;
+    $("#btnNext").hidden = isLast;
+    $("#btnSubmit").hidden = !isLast;
+    if(isLast) buildReview();
+  }
+  stepItems.forEach(function(it){
+    it.addEventListener("click", function(){ goStep(parseInt(it.dataset.step,10)); });
+  });
+  $("#btnPrev").addEventListener("click", function(){ goStep(wizardStep-1); });
+  $("#btnNext").addEventListener("click", function(){
+    if(validatePanel(wizardStep)) goStep(wizardStep+1);
+    else showToast("Completa los campos obligatorios antes de continuar.");
+  });
+
+  function participantCardHTML(id, num){
+    return '<div class="participant-card">' +
+      '<div class="participant-card-head"><svg class="icon" width="15" height="15"><use href="#i-user"/></svg> ESTUDIANTE '+num+'</div>' +
+      '<div class="grid cols-3">' +
+        '<div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
+        '<div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
+        '<div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
+        '<div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="est'+id+'-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>' +
+        '<div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="est'+id+'-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
+        '<div class="field"><label>Grado <span class="req">*</span></label><div class="ctrl select"><select required id="est'+id+'-grado"><option value="">Seleccione</option>'+GRADOS.map(function(g){return "<option>"+g+"</option>";}).join("")+'</select></div><span class="field-error">Selecciona el grado.</span></div>' +
+        '<div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="est'+id+'-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>' +
+        '<div class="field" style="grid-column:span 2"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="est'+id+'-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>' +
+      '</div></div>';
+  }
+  function renderParticipantes(){
+    var wrap = $("#participantesList");
+    wrap.innerHTML = participantIds.map(function(id,idx){ return participantCardHTML(id, idx+1); }).join("");
+  }
+  function uniqueProfesores(){
+    var seen = {}, list = [];
+    fichas.forEach(function(f){
+      var p = f.profesor;
+      var key = (p.numdoc || (p.nombres+p.appat+p.apmat)).toLowerCase();
+      if(!p.nombres && !p.appat) return;
+      if(seen[key]) return;
+      seen[key] = true;
+      list.push({ label: [p.nombres,p.appat,p.apmat].filter(Boolean).join(" ") + " · ficha " + f.codigo, data: p });
+    });
+    return list;
+  }
+  function renderProfReuseOptions(){
+    var note = $("#profReuseNote"), sel = $("#profReuseSelect");
+    var options = uniqueProfesores();
+    if(options.length===0){ note.hidden = true; return; }
+    note.hidden = false;
+    sel.innerHTML = options.map(function(o,i){ return '<option value="'+i+'">'+esc(o.label)+'</option>'; }).join("");
+    sel.dataset.options = JSON.stringify(options.map(function(o){ return o.data; }));
+  }
+  $("#btnUseProfReuse").addEventListener("click", function(){
+    var sel = $("#profReuseSelect");
+    var options = JSON.parse(sel.dataset.options || "[]");
+    var p = options[parseInt(sel.value,10)];
+    if(!p) return;
+    $("#p-appat").value = p.appat || "";
+    $("#p-apmat").value = p.apmat || "";
+    $("#p-nombres").value = p.nombres || "";
+    $("#p-tipodoc").value = p.tipodoc || "";
+    $("#p-numdoc").value = p.numdoc || "";
+    $("#p-telefono").value = p.telefono || "";
+    $("#p-correo").value = p.correo || "";
+    $("#p-especialidad").value = p.especialidad || "";
+    $("#p-cursos").value = p.cursos || "";
+    $all(".field", $("[data-panel='4']")).forEach(function(f){ f.classList.remove("invalid"); });
+    showToast("Datos del profesor asesor reutilizados.");
+  });
+
+  function renderEnteraron(){
+    var wrap = $("#enteraronList");
+    wrap.innerHTML = ENTERARON_OPCIONES.map(function(o,i){
+      return '<div class="entero-row"><label class="chk"><input type="checkbox" id="ent-'+i+'-chk"> '+esc(o.label)+'</label>' +
+        (o.detalle ? '<input type="text" id="ent-'+i+'-detalle" placeholder="'+esc(o.detalle)+'">' : '<span style="flex:1"></span>') +
+      '</div>';
+    }).join("");
+  }
+
+  function val(id){ var e=document.getElementById(id); return e?e.value.trim():""; }
+  function reviewItem(label, value){
+    return '<div class="review-item"><dt>'+esc(label)+'</dt><dd'+(value?'':' class="empty"')+'>'+(value?esc(value):'— sin datos —')+'</dd></div>';
+  }
+  function reviewGroup(title, step, itemsHtml){
+    return '<div class="review-group"><div class="review-group-head">'+esc(title)+'<button type="button" class="btn btn-ghost btn-sm" data-edit-step="'+step+'">Editar</button></div><div class="review-list">'+itemsHtml+'</div></div>';
+  }
+  function buildReview(){
+    var html = "";
+    html += reviewGroup("Institución educativa", 0,
+      reviewItem("Nombre", val("ie-nombre")) + reviewItem("Dirección", val("ie-direccion")) +
+      reviewItem("Región", val("ie-region")) + reviewItem("Provincia", val("ie-provincia")) +
+      reviewItem("Distrito", val("ie-distrito")) + reviewItem("Teléfono", val("ie-telefono")) +
+      reviewItem("Correo", val("ie-correo"))
+    );
+    html += reviewGroup("Director", 1,
+      reviewItem("Nombre completo", [val("d-nombres"),val("d-appat"),val("d-apmat")].filter(Boolean).join(" ")) +
+      reviewItem("Documento", [val("d-tipodoc"),val("d-numdoc")].filter(Boolean).join(" ")) +
+      reviewItem("Teléfono", val("d-telefono")) + reviewItem("Correo", val("d-correo"))
+    );
+    html += reviewGroup("Del trabajo", 2,
+      reviewItem("Tema", val("w-tema")) + reviewItem("Título", val("w-titulo")) + reviewItem("Seudónimo", val("w-seudonimo"))
+    );
+    var estItems = "";
+    participantIds.forEach(function(id,idx){
+      estItems += reviewItem("Estudiante "+(idx+1), [val("est"+id+"-nombres"),val("est"+id+"-appat"),val("est"+id+"-apmat")].filter(Boolean).join(" ") + (val("est"+id+"-grado") ? " · "+val("est"+id+"-grado") : ""));
+    });
+    html += reviewGroup("Estudiantes", 3, estItems);
+    html += reviewGroup("Profesor asesor", 4,
+      reviewItem("Nombre completo", [val("p-nombres"),val("p-appat"),val("p-apmat")].filter(Boolean).join(" ")) +
+      reviewItem("Documento", [val("p-tipodoc"),val("p-numdoc")].filter(Boolean).join(" ")) +
+      reviewItem("Correo", val("p-correo")) + reviewItem("Especialidad", val("p-especialidad"))
+    );
+    var enteraron = ENTERARON_OPCIONES.map(function(o,i){
+      var chk = document.getElementById("ent-"+i+"-chk");
+      return chk && chk.checked ? o.label : null;
+    }).filter(Boolean).join(", ");
+    html += reviewGroup("Cómo se enteraron", 5, reviewItem("Medios marcados", enteraron));
+    $("#reviewArea").innerHTML = html;
+    $all("[data-edit-step]", $("#reviewArea")).forEach(function(btn){
+      btn.addEventListener("click", function(){ goStep(parseInt(btn.dataset.editStep,10)); });
+    });
+  }
+
+  $("#ficha-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var codigo = "CE-2026-"+String(Math.floor(1000+Math.random()*8999))+"-"+String(Math.floor(100000+Math.random()*899999));
+    var ficha = {
+      id: nextFichaId++,
+      codigo: codigo,
+      preview:false,
+      colegio:{ nombre:val("ie-nombre"), direccion:val("ie-direccion"), region:val("ie-region"), provincia:val("ie-provincia"), distrito:val("ie-distrito"), telefono:val("ie-telefono"), correo:val("ie-correo") },
+      director:{ appat:val("d-appat"), apmat:val("d-apmat"), nombres:val("d-nombres"), tipodoc:val("d-tipodoc"), numdoc:val("d-numdoc"), telefono:val("d-telefono"), correo:val("d-correo") },
+      trabajo:{ tema:val("w-tema"), titulo:val("w-titulo"), seudonimo:val("w-seudonimo") || "Equipo sin seudónimo" },
+      estudiantes: participantIds.map(function(id){
+        return { appat:val("est"+id+"-appat"), apmat:val("est"+id+"-apmat"), nombres:val("est"+id+"-nombres"), tipodoc:val("est"+id+"-tipodoc"), numdoc:val("est"+id+"-numdoc"), grado:val("est"+id+"-grado"), telefono:val("est"+id+"-telefono"), correo:val("est"+id+"-correo") };
+      }),
+      profesor:{ appat:val("p-appat"), apmat:val("p-apmat"), nombres:val("p-nombres"), tipodoc:val("p-tipodoc"), numdoc:val("p-numdoc"), telefono:val("p-telefono"), correo:val("p-correo"), especialidad:val("p-especialidad"), cursos:val("p-cursos") },
+      entero: ENTERARON_OPCIONES.map(function(o,i){ var c=document.getElementById("ent-"+i+"-chk"); return c&&c.checked?o.label:null; }).filter(Boolean),
+      videoStatus:"pendiente",
+      createdAt: new Date().toLocaleDateString("es-PE",{day:"2-digit",month:"short",year:"numeric"}) + " · " + new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})
+    };
+    fichas.push(ficha);
+    $("#successCode").textContent = codigo;
+    switchView("success");
+    renderAll();
+  });
+
+  $("#btnAnother").addEventListener("click", startNuevaFicha);
+  $("#btnToList").addEventListener("click", function(){ switchView("fichas"); });
+  $("#btnGoUpload").addEventListener("click", function(){
+    switchView("upload");
+    var last = fichas[fichas.length-1];
+    if(last){ $("#up-ficha").value = last.id; renderUploadPreview(); }
+  });
+
+  /* ---------------- Subir video ---------------- */
+  function populateUploadSelect(){
+    var sel = $("#up-ficha");
+    var prev = sel.value;
+    sel.innerHTML = fichas.map(function(f){ return '<option value="'+f.id+'">'+esc(f.trabajo.seudonimo)+' · '+esc(f.codigo)+'</option>'; }).join("");
+    if(prev && fichas.some(function(f){return String(f.id)===prev;})) sel.value = prev;
+  }
+  function currentUploadFicha(){
+    var id = parseInt($("#up-ficha").value,10);
+    return fichas.find(function(f){ return f.id===id; });
+  }
+  function renderUploadPreview(){
+    var f = currentUploadFicha();
+    var wrap = $("#up-preview");
+    if(!f){ wrap.innerHTML=""; return; }
+    wrap.innerHTML = '<div class="ficha-preview">' +
+      '<div class="icon-badge"><svg class="icon" width="16" height="16"><use href="#i-video"/></svg></div>' +
+      '<div><div class="fp-title">'+esc(f.trabajo.titulo || "Sin título")+'</div><div class="fp-sub">'+esc(f.trabajo.seudonimo)+' · '+esc(f.codigo)+'</div></div>' +
+      '<div class="topbar-spacer"></div>' + statusBadge(f.videoStatus) +
+    '</div>';
+  }
+  $("#up-ficha").addEventListener("change", renderUploadPreview);
+
+  var upDropzone = $("#up-dropzone"), upFile = $("#up-file");
+  upDropzone.addEventListener("click", function(){ upFile.click(); });
+  ["dragenter","dragover"].forEach(function(ev){ upDropzone.addEventListener(ev, function(e){ e.preventDefault(); upDropzone.classList.add("drag-active"); }); });
+  ["dragleave","drop"].forEach(function(ev){ upDropzone.addEventListener(ev, function(e){ e.preventDefault(); upDropzone.classList.remove("drag-active"); }); });
+  upDropzone.addEventListener("drop", function(e){
+    if(e.dataTransfer.files.length){ upFile.files = e.dataTransfer.files; onUpFileChange(); }
+  });
+  upFile.addEventListener("change", onUpFileChange);
+  function onUpFileChange(){
+    var f = upFile.files[0];
+    $("#up-file-name").textContent = f ? f.name + " · " + (f.size/1048576).toFixed(1) + " MB" : "Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB";
+  }
+
+  $("#btnSubirVideo").addEventListener("click", function(){
+    var f = currentUploadFicha();
+    if(!f){ showToast("Selecciona una ficha primero."); return; }
+    if(!upFile.files[0]){ showToast("Elige un archivo de video para subir."); return; }
+    var file = upFile.files[0];
+    var progress = $("#up-progress"), bar = $("#up-progress-bar"), pct = $("#up-progress-pct");
+    progress.hidden = false;
+    upDropzone.setAttribute("data-disabled","true");
+    $("#btnSubirVideo").disabled = true;
+    var p = 0;
+    var timer = setInterval(function(){
+      p = Math.min(100, p + 8 + Math.random()*12);
+      bar.style.width = p+"%";
+      pct.textContent = Math.floor(p)+"%";
+      if(p>=100){
+        clearInterval(timer);
+        setTimeout(function(){
+          f.videoStatus = "subido";
+          uploads.unshift({ ficha:f, archivo:file.name, hora: new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"}) });
+          progress.hidden = true;
+          upDropzone.removeAttribute("data-disabled");
+          $("#btnSubirVideo").disabled = false;
+          upFile.value = "";
+          $("#up-file-name").textContent = "Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB";
+          showToast("Video de “"+f.trabajo.seudonimo+"” subido correctamente.");
+          renderAll();
+        }, 350);
+      }
+    }, 180);
+  });
+
+  function renderUploadsTable(){
+    var body = $("#uploadLogBody");
+    body.innerHTML = uploads.map(function(u){
+      return "<tr><td><b>"+esc(u.ficha.trabajo.seudonimo)+"</b><br><span class=\"mono\" style=\"font-size:11px;color:var(--text-faint)\">"+esc(u.ficha.codigo)+"</span></td><td>"+esc(u.archivo)+"</td><td>"+esc(u.hora)+"</td></tr>";
+    }).join("");
+    $("#uploadLogEmpty").hidden = uploads.length>0;
+  }
+
+  /* ---------------- Toast ---------------- */
+  var toastTimer = null;
+  function showToast(msg){
+    $("#toastMsg").textContent = msg;
+    var t = $("#toast");
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 3200);
+  }
+
+  $("#modalClose").addEventListener("click", function(){ $("#modalOverlay").classList.remove("show"); });
+
+  function renderAll(){
+    renderInicio();
+    renderFichaGrid();
+    populateUploadSelect();
+    renderUploadPreview();
+    renderUploadsTable();
+  }
+
+})();
+</script>

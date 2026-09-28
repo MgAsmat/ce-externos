@@ -1,1221 +1,285 @@
-<title>Portal de Participantes</title>
-<style>
-  :root{
-    --bg:#EEF1F5; --surface:#FFFFFF; --surface-2:#F6F8FA; --border:#DDE3E9; --border-strong:#C3CDD6;
-    --text:#182333; --text-muted:#5C6B7A; --text-faint:#8A97A3;
-    --navy:#0F1E33; --navy-2:#16283F; --navy-ink:#EAF0F6;
-    --teal:#0C6E77; --teal-2:#0F8890; --teal-soft:#E2F1F1; --teal-soft-strong:#C9E7E7;
-    --amber:#9A6300; --amber-soft:#FBEFD9;
-    --green:#186B45; --green-soft:#DEF2E7;
-    --red:#B23A26; --red-soft:#FBE8E3;
-    --blue:#1D5FAE; --blue-soft:#E3ECF9;
-    --purple:#7A3FA0; --purple-soft:#F1E6F7;
-    --focus:#0C6E77;
-    --r-sm:8px; --r-md:12px; --r-lg:18px;
-    --shadow-sm:0 1px 2px rgba(15,30,51,.07);
-    --shadow-md:0 10px 30px -12px rgba(15,30,51,.22);
-    --sidebar-w:240px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#0B1420; --surface:#121E2E; --surface-2:#182636; --border:#26374B; --border-strong:#324A63;
-      --text:#E7EDF4; --text-muted:#96A6B8; --text-faint:#6E8094;
-      --navy:#080E18; --navy-2:#0D1826; --navy-ink:#EAF0F6;
-      --teal:#3FB6BC; --teal-2:#57C8CD; --teal-soft:#123236; --teal-soft-strong:#164047;
-      --amber:#E3B24D; --amber-soft:#3A2E10;
-      --green:#5FCB93; --green-soft:#123322;
-      --red:#F0806A; --red-soft:#3A1712;
-      --blue:#7EB2F0; --blue-soft:#122538;
-      --purple:#C79CE0; --purple-soft:#291B36;
-      --focus:#57C8CD;
-      --shadow-sm:0 1px 2px rgba(0,0,0,.35); --shadow-md:0 14px 36px -14px rgba(0,0,0,.6);
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#0B1420; --surface:#121E2E; --surface-2:#182636; --border:#26374B; --border-strong:#324A63;
-    --text:#E7EDF4; --text-muted:#96A6B8; --text-faint:#6E8094;
-    --navy:#080E18; --navy-2:#0D1826; --navy-ink:#EAF0F6;
-    --teal:#3FB6BC; --teal-2:#57C8CD; --teal-soft:#123236; --teal-soft-strong:#164047;
-    --amber:#E3B24D; --amber-soft:#3A2E10;
-    --green:#5FCB93; --green-soft:#123322;
-    --red:#F0806A; --red-soft:#3A1712;
-    --blue:#7EB2F0; --blue-soft:#122538;
-    --purple:#C79CE0; --purple-soft:#291B36;
-    --focus:#57C8CD;
-    --shadow-sm:0 1px 2px rgba(0,0,0,.35); --shadow-md:0 14px 36px -14px rgba(0,0,0,.6);
-  }
-
-  *{ box-sizing:border-box; }
-  body{ background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
-  h1,h2,h3{ text-wrap:balance; margin:0; }
-  .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; }
-  button{ font-family:inherit; }
-  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; border-radius:4px; }
-  .icon{ width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:inline-block; vertical-align:-0.15em; flex-shrink:0; }
-  [hidden]{ display:none!important; }
-
-  /* ===================== LOGIN ===================== */
-  #view-login{ min-height:100vh; min-height:100svh; display:grid; grid-template-columns:1.1fr 1fr; background:var(--bg); }
-  @media (max-width:840px){ #view-login{ grid-template-columns:1fr; } .login-brand{ min-height:220px; } }
-  .login-brand{
-    background:radial-gradient(120% 140% at 15% 0%, #163650 0%, var(--navy) 55%, var(--navy-2) 100%);
-    color:var(--navy-ink); padding:48px 44px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;
-  }
-  .login-brand::after{
-    content:""; position:absolute; right:-90px; bottom:-90px; width:340px; height:340px; border-radius:50%;
-    background:radial-gradient(circle, rgba(63,182,188,.28), transparent 70%);
-  }
-  .login-mark{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; letter-spacing:.2px; position:relative; z-index:1; }
-  .login-mark .mark{ width:34px; height:34px; border-radius:9px; background:var(--teal-2); color:var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
-  .login-hero{ position:relative; z-index:1; max-width:30ch; }
-  .login-hero .eyebrow{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7FD3D6; margin-bottom:10px; }
-  .login-hero h1{ font-size:clamp(26px,3.6vw,34px); font-weight:700; line-height:1.15; }
-  .login-hero p{ margin:14px 0 0; color:#B9C7D6; font-size:14px; line-height:1.6; max-width:38ch; }
-  .login-stats{ display:flex; gap:26px; position:relative; z-index:1; }
-  .login-stats div b{ display:block; font-size:22px; font-weight:700; font-family:"IBM Plex Mono",monospace; }
-  .login-stats div span{ font-size:11.5px; color:#8FA3B8; }
-
-  .login-panel{ display:flex; align-items:center; justify-content:center; padding:40px 24px; }
-  .login-card{ width:100%; max-width:380px; }
-  .login-card h2{ font-size:21px; font-weight:700; }
-  .login-card > p{ margin:8px 0 28px; color:var(--text-muted); font-size:13.5px; line-height:1.55; }
-  .google-btn{
-    width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:12px 18px; border-radius:999px;
-    border:1px solid var(--border-strong); background:var(--surface); color:var(--text); font-size:14px; font-weight:600; cursor:pointer;
-    box-shadow:var(--shadow-sm); transition:box-shadow .15s ease, transform .05s ease;
-  }
-  .google-btn:hover{ box-shadow:var(--shadow-md); }
-  .google-btn:active{ transform:translateY(1px); }
-  .google-btn[disabled]{ opacity:.7; cursor:wait; }
-  .google-spin{ width:16px; height:16px; border-radius:50%; border:2px solid var(--border-strong); border-top-color:var(--teal); animation:spin .7s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .login-note{ display:flex; gap:10px; padding:12px 14px; border-radius:var(--r-md); background:var(--teal-soft); border:1px solid var(--teal-soft-strong); font-size:12px; color:var(--text); line-height:1.5; }
-  .login-note .icon{ color:var(--teal); flex:0 0 auto; margin-top:1px; }
-  .login-foot{ margin-top:26px; font-size:11.5px; color:var(--text-faint); line-height:1.6; }
-  .login-foot a{ color:var(--teal); text-decoration:none; font-weight:600; }
-
-  /* ===================== APP SHELL ===================== */
-  .shell{ display:flex; min-height:100vh; min-height:100svh; }
-  .overlay{ position:fixed; inset:0; background:rgba(8,14,24,.5); z-index:30; opacity:0; pointer-events:none; transition:opacity .2s ease; }
-  .overlay.show{ opacity:1; pointer-events:auto; }
-
-  .sidebar{ width:var(--sidebar-w); flex:0 0 auto; background:var(--navy); color:var(--navy-ink); display:flex; flex-direction:column; position:sticky; top:0; align-self:flex-start; height:100vh; height:100svh; z-index:40; }
-  .brand{ display:flex; align-items:center; gap:10px; padding:20px 20px 16px; font-weight:700; font-size:16px; border-bottom:1px solid rgba(255,255,255,.08); }
-  .brand .mark{ width:32px; height:32px; border-radius:9px; background:var(--teal-2); color:var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; }
-  .brand small{ display:block; font-weight:400; font-size:10.5px; color:#9DB0C4; letter-spacing:.3px; }
-  .sidebar-close{ display:none; margin-left:auto; background:transparent; border:0; color:#9FB1C4; cursor:pointer; }
-
-  .nav{ flex:1; overflow-y:auto; padding:14px 10px; display:flex; flex-direction:column; gap:2px; }
-  .nav a{ display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:var(--r-sm); color:#C4D3E2; font-size:13.5px; font-weight:600; text-decoration:none; border-left:2px solid transparent; }
-  .nav a .icon{ color:#7C93AA; }
-  .nav a:hover{ background:rgba(255,255,255,.06); color:#fff; }
-  .nav a.active{ background:rgba(63,182,188,.14); color:#fff; border-left-color:var(--teal-2); }
-  .nav a.active .icon{ color:var(--teal-2); }
-  .nav-cta{ margin:6px 2px 0; padding:11px 12px; border-radius:var(--r-sm); background:var(--teal); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; gap:9px; cursor:pointer; border:0; text-align:left; }
-  .nav-cta:hover{ filter:brightness(1.08); }
-
-  .sidebar-foot{ padding:14px 18px; border-top:1px solid rgba(255,255,255,.08); font-size:11px; color:#6E8094; line-height:1.5; }
-
-  .main{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; }
-  .topbar{ position:sticky; top:0; z-index:20; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; padding:12px 22px; }
-  .burger{ display:none; width:36px; height:36px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface); align-items:center; justify-content:center; cursor:pointer; color:var(--text); }
-  .crumb{ font-size:12px; color:var(--text-faint); }
-  .topbar-title{ font-size:15.5px; font-weight:700; }
-  .topbar-spacer{ flex:1; }
-  .contest-pill{ display:flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px; background:var(--teal-soft); color:var(--teal); font-size:12px; font-weight:700; }
-  .contest-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 3px var(--teal-soft-strong); }
-  .user-chip{ display:flex; align-items:center; gap:9px; padding:5px 10px 5px 5px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); }
-  .avatar{ width:28px; height:28px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; flex:0 0 auto; }
-  .user-chip .name{ font-size:12.5px; font-weight:600; line-height:1.1; }
-  .user-chip .role{ font-size:10.5px; color:var(--text-faint); line-height:1.1; }
-  .logout-btn{ display:flex; align-items:center; gap:6px; padding:8px 13px; border-radius:999px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-muted); font-weight:600; font-size:12.5px; cursor:pointer; white-space:nowrap; }
-  .logout-btn:hover{ background:var(--red-soft); color:var(--red); border-color:transparent; }
-
-  .content{ padding:24px; flex:1; max-width:1160px; width:100%; margin:0 auto; }
-  .page-head{ margin-bottom:18px; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-  .page-head h1{ font-size:22px; font-weight:700; }
-  .page-head p{ margin:5px 0 0; color:var(--text-muted); font-size:13.5px; max-width:60ch; }
-
-  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); margin-bottom:16px; overflow:hidden; }
-  .card-head{ display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); }
-  .card-head .icon-badge{ width:26px; height:26px; border-radius:8px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; }
-  .card-head h2{ font-size:13.5px; font-weight:700; }
-  .card-head .hint{ margin-left:auto; font-size:12px; color:var(--text-faint); }
-  .card-body{ padding:20px; }
-
-  /* form controls */
-  .field{ display:flex; flex-direction:column; gap:6px; min-width:0; }
-  .field label{ font-size:12.5px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
-  .field label .req{ color:var(--red); }
-  .ctrl{ position:relative; display:flex; align-items:center; }
-  .ctrl .icon{ position:absolute; left:11px; color:var(--text-faint); pointer-events:none; }
-  input[type=text], input[type=tel], input[type=email], select{
-    width:100%; font-size:13.5px; color:var(--text); background:var(--surface); border:1px solid var(--border-strong);
-    border-radius:var(--r-sm); padding:9px 12px; font-family:inherit; transition:border-color .15s ease, box-shadow .15s ease;
-  }
-  .ctrl.has-icon input, .ctrl.has-icon select{ padding-left:34px; }
-  input::placeholder{ color:var(--text-faint); }
-  input:focus, select:focus{ border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); outline:none; }
-  select{ appearance:none; -webkit-appearance:none; background-image:none; padding-right:32px; cursor:pointer; }
-  .ctrl.select::after{ content:""; position:absolute; right:12px; width:9px; height:9px; border-right:1.6px solid var(--text-faint); border-bottom:1.6px solid var(--text-faint); transform:rotate(45deg) translateY(-50%); pointer-events:none; top:50%; margin-top:-4px; }
-  .field.invalid input, .field.invalid select{ border-color:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
-  .field-error{ font-size:11.5px; color:var(--red); display:none; }
-  .field.invalid .field-error{ display:block; }
-
-  .grid{ display:grid; gap:16px; }
-  .grid.cols-3{ grid-template-columns:repeat(3,1fr); }
-  .grid.cols-2{ grid-template-columns:repeat(2,1fr); }
-  @media (max-width:820px){ .grid.cols-3{ grid-template-columns:repeat(2,1fr);} }
-  @media (max-width:560px){ .grid.cols-3, .grid.cols-2{ grid-template-columns:1fr; } }
-
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; font-size:13px; font-weight:600; padding:9px 16px; border-radius:var(--r-sm); border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:filter .12s ease, background .12s ease, transform .05s ease; }
-  .btn:active{ transform:translateY(1px); }
-  .btn-primary{ background:var(--teal); color:#fff; }
-  .btn-primary:hover{ filter:brightness(1.08); }
-  .btn-ghost{ background:var(--surface); color:var(--text); border-color:var(--border-strong); }
-  .btn-ghost:hover{ background:var(--surface-2); }
-  .btn-sm{ padding:7px 12px; font-size:12.5px; }
-  .btn[disabled]{ opacity:.45; cursor:not-allowed; pointer-events:none; }
-  .actions-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
-
-  .badge{ display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; }
-  .badge-green{ background:var(--green-soft); color:var(--green); }
-  .badge-amber{ background:var(--amber-soft); color:var(--amber); }
-  .badge-teal{ background:var(--teal-soft); color:var(--teal); }
-  .badge-neutral{ background:var(--surface-2); color:var(--text-muted); border:1px solid var(--border); }
-
-  /* dashboard */
-  .kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:18px; }
-  .kpi-tile{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 18px; box-shadow:var(--shadow-sm); }
-  .kpi-label{ font-size:11.5px; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:6px; }
-  .kpi-label .icon{ color:var(--teal); }
-  .kpi-value{ font-size:28px; font-weight:700; margin-top:6px; font-family:"IBM Plex Mono",monospace; }
-
-  .deadline-banner{ display:flex; align-items:center; gap:14px; padding:16px 20px; border-radius:var(--r-lg); background:linear-gradient(120deg,var(--navy),var(--navy-2)); color:var(--navy-ink); margin-bottom:18px; }
-  .deadline-banner .icon-wrap{ width:38px; height:38px; border-radius:10px; background:rgba(63,182,188,.18); color:var(--teal-2); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
-  .deadline-banner b{ display:block; font-size:14px; }
-  .deadline-banner span{ font-size:12px; color:#9FB1C4; }
-  .deadline-banner .topbar-spacer{ flex:1; }
-
-  /* ficha cards */
-  .ficha-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
-  .ficha-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); padding:18px; display:flex; flex-direction:column; gap:10px; }
-  .ficha-card .fc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-  .ficha-card .fc-title{ font-size:15px; font-weight:700; }
-  .ficha-card .fc-code{ font-size:11px; color:var(--text-faint); margin-top:2px; }
-  .ficha-card .fc-meta{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--text-muted); }
-  .ficha-card .fc-meta .row{ display:flex; align-items:center; gap:7px; }
-  .ficha-card .fc-meta .icon{ color:var(--text-faint); flex:0 0 auto; }
-  .ficha-card .fc-actions{ display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
-  .preview-tag{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; border:1px dashed var(--border-strong); color:var(--text-faint); font-size:10.5px; font-weight:600; }
-
-  /* reuse chooser */
-  .choice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  @media (max-width:640px){ .choice-grid{ grid-template-columns:1fr; } }
-  .choice-card{ border:1.5px solid var(--border-strong); border-radius:var(--r-md); padding:18px; cursor:pointer; text-align:left; background:var(--surface); }
-  .choice-card:hover{ border-color:var(--teal); background:var(--teal-soft); }
-  .choice-card .icon-wrap{ width:34px; height:34px; border-radius:9px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
-  .choice-card b{ display:block; font-size:13.5px; }
-  .choice-card span{ display:block; font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.5; }
-  .reuse-note{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:var(--r-md); background:var(--teal-soft); border:1px solid var(--teal-soft-strong); font-size:12.5px; color:var(--text); margin-bottom:16px; }
-  .reuse-note .icon{ color:var(--teal); flex:0 0 auto; }
-  .reuse-note b{ font-weight:700; }
-
-  /* wizard */
-  .wizard{ display:grid; grid-template-columns:210px 1fr; gap:20px; align-items:start; }
-  @media (max-width:860px){ .wizard{ grid-template-columns:1fr; } }
-  .steps{ position:sticky; top:76px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:10px; box-shadow:var(--shadow-sm); }
-  @media (max-width:860px){ .steps{ position:static; flex-direction:row; overflow-x:auto; } }
-  .step-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm); cursor:pointer; border:0; background:transparent; text-align:left; width:100%; color:var(--text-muted); }
-  @media (max-width:860px){ .step-item{ width:auto; white-space:nowrap; } }
-  .step-item:hover{ background:var(--surface-2); }
-  .step-num{ width:23px; height:23px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border-strong); color:var(--text-faint); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
-  .step-item.current{ background:var(--teal-soft); color:var(--teal); }
-  .step-item.current .step-num{ background:var(--teal); border-color:var(--teal); color:#fff; }
-  .step-item.done .step-num{ background:var(--green); border-color:var(--green); color:#fff; }
-  .step-item.done{ color:var(--text); }
-  .step-label{ font-size:12.5px; font-weight:600; line-height:1.2; }
-
-  .step-panel{ display:none; }
-  .step-panel.active{ display:block; animation:fade .18s ease; }
-  @keyframes fade{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
-
-  .wizard-nav{ display:flex; align-items:center; gap:10px; padding-top:18px; margin-top:4px; border-top:1px solid var(--border); }
-  .wizard-nav .topbar-spacer{ flex:1; }
-  .req-legend{ font-size:11.5px; color:var(--text-faint); }
-  .req-legend .req{ color:var(--red); }
-
-  .participant-card{ border:1px solid var(--border); border-radius:var(--r-md); padding:16px; margin-bottom:14px; background:var(--surface-2); }
-  .participant-card-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:12.5px; font-weight:700; color:var(--text-muted); }
-  .participant-card-head .icon{ color:var(--purple); }
-
-  .entero-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
-  .entero-row:last-child{ border-bottom:0; }
-  .entero-row label.chk{ display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600; min-width:250px; flex:0 0 auto; }
-  .entero-row input[type=checkbox]{ width:16px; height:16px; accent-color:var(--teal); flex:0 0 auto; }
-  .entero-row input[type=text]{ flex:1; }
-  @media (max-width:640px){ .entero-row{ flex-direction:column; align-items:stretch; gap:6px; } .entero-row label.chk{ min-width:0; } }
-
-  .review-group{ margin-bottom:14px; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
-  .review-group-head{ display:flex; align-items:center; padding:10px 14px; background:var(--surface-2); font-size:12.5px; font-weight:700; color:var(--text-muted); }
-  .review-group-head button{ margin-left:auto; }
-  .review-list{ display:grid; grid-template-columns:1fr 1fr; }
-  @media (max-width:640px){ .review-list{ grid-template-columns:1fr; } }
-  .review-item{ padding:10px 14px; border-top:1px solid var(--border); }
-  .review-item dt{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.3px; }
-  .review-item dd{ margin:2px 0 0; font-size:13px; font-weight:600; }
-
-  .success-card{ text-align:center; padding:52px 20px; }
-  .success-icon{ width:64px; height:64px; border-radius:50%; background:var(--green-soft); color:var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
-  .success-icon .icon{ width:30px; height:30px; }
-  .success-code{ display:inline-block; margin-top:10px; padding:8px 16px; border-radius:999px; background:var(--teal-soft); color:var(--teal); font-weight:700; }
-
-  /* upload */
-  .dropzone{ border:2px dashed var(--border-strong); border-radius:var(--r-md); padding:34px 20px; text-align:center; cursor:pointer; background:var(--surface-2); transition:border-color .15s ease, background .15s ease; }
-  .dropzone:hover, .dropzone.drag-active{ border-color:var(--teal); background:var(--teal-soft); }
-  .dropzone input[type=file]{ display:none; }
-  .dropzone .icon{ width:28px; height:28px; color:var(--text-faint); margin-bottom:8px; }
-  .dropzone .dz-title{ font-size:13.5px; font-weight:600; }
-  .dropzone .dz-sub{ font-size:12px; color:var(--text-faint); margin-top:4px; }
-  .dropzone[data-disabled="true"]{ opacity:.5; cursor:not-allowed; pointer-events:none; }
-
-  .upload-progress{ margin-top:14px; }
-  .upload-progress .bar{ height:8px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; }
-  .upload-progress .bar > span{ display:block; height:100%; width:0%; background:var(--teal); border-radius:999px; transition:width .25s ease; }
-  .upload-progress .lbl{ font-size:11.5px; color:var(--text-muted); margin-top:6px; display:flex; justify-content:space-between; }
-
-  .ficha-preview{ display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface-2); margin-top:10px; }
-  .ficha-preview .icon-badge{ width:34px; height:34px; border-radius:9px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
-  .ficha-preview .fp-title{ font-weight:600; font-size:13px; }
-  .ficha-preview .fp-sub{ font-size:11.5px; color:var(--text-faint); }
-  .ficha-preview .topbar-spacer{ flex:1; }
-
-  .table-scroll{ overflow-x:auto; }
-  table{ width:100%; border-collapse:collapse; min-width:460px; }
-  thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted); padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap; }
-  tbody td{ padding:11px 14px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:top; }
-  tbody tr:last-child td{ border-bottom:0; }
-  .empty-state{ padding:44px 20px; text-align:center; color:var(--text-muted); }
-  .empty-state .icon{ width:30px; height:30px; color:var(--text-faint); margin-bottom:8px; }
-
-  .toast{ position:fixed; left:50%; bottom:24px; transform:translate(-50%,12px); background:var(--navy); color:#fff; padding:12px 16px; border-radius:var(--r-md); display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-md); z-index:80; font-size:13px; opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; }
-  .toast.show{ opacity:1; pointer-events:auto; transform:translate(-50%,0); }
-
-  .modal-overlay{ position:fixed; inset:0; background:rgba(8,14,24,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .15s ease; }
-  .modal-overlay.show{ opacity:1; pointer-events:auto; }
-  .modal{ background:var(--surface); border-radius:var(--r-lg); width:100%; max-width:560px; box-shadow:var(--shadow-md); border:1px solid var(--border); transform:translateY(8px); transition:transform .15s ease; }
-  .modal-overlay.show .modal{ transform:translateY(0); }
-  .modal-head{ display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); }
-  .modal-head h2{ font-size:15px; }
-  .modal-close{ margin-left:auto; width:30px; height:30px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .modal-body{ padding:20px; }
-
-  .view{ display:none; }
-  .view.active{ display:block; }
-  .subview{ display:none; }
-  .subview.active{ display:block; }
-
-  @media (max-width:960px){
-    .sidebar{ position:fixed; left:0; top:0; transform:translateX(-100%); transition:transform .22s ease; box-shadow:var(--shadow-md); }
-    .sidebar.open{ transform:translateX(0); }
-    .burger{ display:flex; }
-    .sidebar-close{ display:flex; }
-    .content{ padding:16px; }
-    .topbar{ padding:10px 14px; }
-    .user-chip .name, .user-chip .role{ display:none; }
-    .contest-pill span{ display:none; }
-  }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concurso Escolar de Videos BCRP 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+<!-- Estructura fija del header y footer (no editable) -->
+<style id="ce-base">
+:root{--ce-primary:#0A3D7A;--ce-primary-dark:#072B57;--ce-muted:#64748b;--ce-border:#e2e8f0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0}
+.ce-header{position:sticky;top:0;z-index:1030;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--ce-border)}
+.ce-header__inner{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ce-brands{display:flex;align-items:center;gap:16px;min-width:0}
+.ce-brand{display:flex;align-items:center}
+.ce-brand--bcrp{padding-left:16px;border-left:1px solid var(--ce-border)}
+.ce-brand img{height:40px;width:auto;display:block}
+.ce-nav{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;flex-wrap:wrap}
+.ce-nav a{display:block;padding:8px 10px;color:#334155;text-decoration:none;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;border-radius:8px}
+.ce-nav a:hover{color:var(--ce-primary);background:#f1f5f9}
+.ce-nav-toggle{display:none}
+.ce-nav-btn{display:none;margin-left:auto;width:42px;height:38px;border-radius:8px;cursor:pointer;align-items:center;justify-content:center}
+.ce-nav-btn span,.ce-nav-btn span::before,.ce-nav-btn span::after{display:block;width:22px;height:2px;background:#334155;position:relative;content:''}
+.ce-nav-btn span::before{position:absolute;top:-7px}.ce-nav-btn span::after{position:absolute;top:7px}
+@media (max-width:575px){.ce-brands{gap:10px}.ce-brand img{height:30px}.ce-brand--bcrp{padding-left:10px}}
+@media (max-width:1199px){.ce-nav-btn{display:flex}.ce-nav{display:none;width:100%;flex-direction:column;margin:0}.ce-nav-toggle:checked~.ce-nav{display:flex}}
+.ce-footer{background:#fff;border-top:1px solid #f1f5f9;padding:64px 0 32px;color:var(--ce-muted);font-size:14px}
+.ce-footer__inner{max-width:1140px;margin:0 auto;padding:0 20px}
+.ce-footer__cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:40px}
+.ce-footer__logo{height:40px;width:auto;display:block;margin-bottom:20px}
+.ce-footer__desc{max-width:300px;font-weight:500;margin:0 0 20px}
+.ce-social{display:flex;gap:12px}
+.ce-social a{width:40px;height:40px;border-radius:50%;background:#f8f9fa;color:#64748b;display:flex;align-items:center;justify-content:center;opacity:.8}
+.ce-social a:hover{opacity:1;color:var(--ce-primary)}
+.ce-footer__title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--ce-primary-dark);margin:0 0 20px}
+.ce-contact{display:flex;flex-direction:column;gap:14px}
+.ce-contact__item{display:flex;align-items:center;gap:14px;color:var(--ce-muted);text-decoration:none;font-weight:700;font-size:13px}
+a.ce-contact__item:hover{color:var(--ce-primary)}
+.ce-contact__icon{flex:0 0 auto;width:36px;height:36px;border-radius:6px;background:var(--ce-primary);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.ce-footer__bottom{padding-top:24px;border-top:1px solid var(--ce-border);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.ce-footer__copy{margin:0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ce-footer__docs{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ce-footer__link{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:inherit;text-decoration:none}
+.ce-footer__link:hover{color:var(--ce-primary)}
+.ce-footer__btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:8px;background:var(--ce-primary);color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-decoration:none}
+.ce-footer__btn:hover{background:var(--ce-primary-dark);color:#fff}
+@media (max-width:767px){.ce-footer__cols{grid-template-columns:1fr}.ce-footer__bottom{flex-direction:column;text-align:center}.ce-footer__docs{justify-content:center}}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-
-<svg style="display:none">
-  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
-  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
-  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
-  <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
-  <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></symbol>
-  <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
-  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
-  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></symbol>
-  <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
-  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
-  <symbol id="i-credit-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
-  <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="9" y1="13" x2="9" y2="13.01"/><line x1="14" y1="9" x2="14" y2="9.01"/><line x1="14" y1="13" x2="14" y2="13.01"/><path d="M10 21v-4h4v4"/></symbol>
-  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></symbol>
-  <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
-  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
-  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
-  <symbol id="i-repeat" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
-</svg>
-
-<!-- ================= VIEW: LOGIN ================= -->
-<section id="view-login">
-  <div class="login-brand">
-    <div class="login-mark"><span class="mark">BC</span> BCRP · Concurso Escolar de Videos</div>
-    <div class="login-hero">
-      <div class="eyebrow">Portal de participantes · Edición 2026</div>
-      <h1>Inscribe a tu equipo y sube tu video ganador.</h1>
-      <p>Registra los datos de tu equipo y sube tu video desde un solo lugar.</p>
+<!-- Hoja de estilos de la edición -->
+<link rel="stylesheet" href="estilos-landing-2026.css">
+</head>
+<body>
+<header class="ce-header">
+  <div class="ce-header__inner">
+    <div class="ce-brands">
+      <a class="ce-brand" href="#"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%2248%22%20viewBox%3D%220%200%20200%2048%22%3E%3Crect%20x%3D%220%22%20y%3D%224%22%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%228%22%20fill%3D%22%230A3D7A%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2230%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2214%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EBC%3C%2Ftext%3E%3Ctext%20x%3D%2250%22%20y%3D%2222%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%230A3D7A%22%3ECONCURSO%20ESCOLAR%3C%2Ftext%3E%3Ctext%20x%3D%2250%22%20y%3D%2239%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23C8102E%22%3EBCRP%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Concurso Escolar BCRP 2026"></a>
+      <a class="ce-brand ce-brand--bcrp" href="https://www.bcrp.gob.pe" target="_blank" rel="noopener"><img src="data:image/webp;base64,UklGRnhUAABXRUJQVlA4WAoAAAAwAAAARwIAfwAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBI9jAAAAH/JyRI8P94a0Sk7uGP///FUvr/u8+cc7YLll0WgaVBOgQUpbEDREDsLlDBQhC7lVZRFFsp66V0qJw1QBSku2th2e49MfO4/3FmnjO7q77fy18R/Z8A1Eq9XtsBN07+bPXGI3klJblHN63+dMKoC5pF4+xKT2KXV/eGhC6axd9dmeQ5a6Lt1L/OmELbYM6Bffv2nQ5akDTzNzwYfxaE3n7CRlNIStmO76c/eHHXNF2z1NO6X/HEnF9OGSTlzNSOZznE9lllkiLFu768Khnq3voZTZs3Tk+KOm/m7kohwx9nns1w8d4gSdk8smEM1PVBnx3IKyotKynM+fv5ZjGZ74RIKXrWe5aCdvkaU2jue6ajBnWt78dHTaG9BH4bn9LkyVNC+aXH2Qhah+8NirH+Ri8cegasDZNintm+5rtvv/9tf7mQPHSDp97MUmHhDd6zD54SkqfPg2PtG5IML+gIW/2WgyRlXSwyc0g+e7ZB979N8vB1MXB8WbZQtlyTCmVv779I2dYaiVNNml8NaaifPRA1MUCWvlkfjvWJIcrhsbFQTbn4qZUnDZLcnA59XJiU4P5vHxmYfFZA0gqh7OwA594PhfJjPSjGtv+oiqQES3ILheuigWuqaCnln3eJr/PreEYYmhQL5555JkNjomAf/3J2WCh5X1zdvF5c6kkazwC4MUwuWVYuFOPUzJi6vVG5ZOBOHc61V4Rld2qwbTrztFD+mtQrDpZDyhjsCWCCMKdtXJ+n1hmUM6/Wr8NLX19GSskdcc5uMqXqbtimPl5KyV98EVRfJT8H4P1WuAaAdt7X+ZT9/T11dkDqPIPkH/FO6hVSPvPYDKokQ1PioN6gksHWABLP0LgGkYnfmjQ/9dTZpb1xQEjKgUy1xO1CyuYBEb6vwwy92wqOJ4hMA4BrDBamRwAXbqFkZdTNNXk5T1j6w9j9IgXdlR4wue3TKpY/FA1gdIHk9IDzFmXcHKH9QI6xQso7AdmXWQcXe1eAUvJNEyBho/BgqkJ6BYMXo99xkaleAD3LuSPKmW8/y3wA0N/g0WgraOOqWNKszq3t3wbNd5oisuE2ylcKL5KfakDGj2LMAIDLA/Kh5ggzKUMidD9lmA1wh8ktSXVrSVPDElzUCbatqxi8xCb2MMPdACDhOwk9pwN4h5UdnMQM+0lkVgSGk/MVcLMp39Wptf2VcnAUVG8Pc2+s1YMii7UI6CskdAmABnkyTU2/bIuQ/NOicZhlE+Lt9Blh8z6t7qx3scgPKVDfyFB3C30Lg01hnXxYcpvVP+ec6VISo5L8m0EpCfGkFqH/QsruRjbQfmZxZl2Z9mQV86+Hw8zNlIUWiUU0d91ohUGmGIZhmJQLFC7cR/59SexxFusRGC4kj1xsgxan5Qe9bkyfasqO86HuuamSZGWDiAtMksY0n4X2jrCqpDBPeKddxxMkK7f9UM6KRlpEchXLSpnb0wZjaVxaJxbzoZib4qDueV1oFFGuiZhOKS00xR8dgbiT/J9Hj6ngEzbp2QwUVxpCksbxuUMaJ3gP8njPMwx1tkko5Pd1Ydos4XfxUNenh0gxyecAeA6zsnXDuWK+aYEZPBMHbz6fstK+ktCwRm36PfjFkRBJMcuPZhUxP7lnKbfHWuF6s6JFHdiNJg/Vg3L90Z8FSDIkXAAgPsTDgO8zGldbtKgwh8CbZzdYZDIs9UaDH/1wUxUjQ1/c9aTI8zb1T8vUOrCY/4lMUEi84PNSoZTu/npEmzDXAWhIrgVQ/4hs8EZoa7ksuUEZJ1ho38vxJCvr6KvmbMoJkzTJ0400C+1bbk+66I3bYuu2EL+FpedaRT1+Miw0jz+U5gNiAszWgXbkYgDoGjKvj8CrNIqKTD5u0TJoXgvHnvgeU/NNklKyfJAXAC4zQzlhMSfWcSH5hGyKBtBk1hGhueuJrjoi9WMsiQJ6kd+e99Bc/y6DP2sR19LS6mXKkT++fXVkM6VIX+ebv8ghaZ5eu/DLJX8LI7+s68LdZuh8tJlSTMlbOESDfRar4oCBpGkKKSZPREd0I997wuD4CP03mkJSwicW3X9Bikqkd8CM34qEkeGcH98plhk1JbmhcoN43bXu/dV8DS1T1dIbWjdQ0Rr2v/Hee2+/rJkHwHkNlfTMS265997bLsnUqimh+4i77r37uk7RAOIvBLSGbqZriG5omarkbWibBl9Dd4G0hoppSV73vDfqDnwNVWP+3bQ/Ze0TYUrpnHgoz2coGbiSlFDZya/vvp2ViRHJwhHRIY6LiDkqU4a+sCm30hCSga8vjNdUIuNHf5T14zv3dNah/yLP15RZRwpMkpTIcMXe2Z2iXNF/zolRuqiwSkgWNVTxbD5RKZSK42vt9NZfByVQVFBUZfza2Ruz8UoFT4dfzFBpQWGFGV7dTq+G+CcLJFRWUFAePn1TrP76l0DSvuMVQlIUyfJ0XF4YEJKnG6p0OHAyKJTSYxuih5ikWJJiTYYS8NuxMiFJETECuYtvSHRpuHmVgy4HTwVJUgJnjgz7d8NDNIWhiWlQ175luCkwmpzVMtUDJIXC6RExAY6Os4nPk4EAojLO/R8jzbz1N3rVVD375eGaAi1ulpCFU28c2O/qZ7cLjSNjdRcGmOEuSnpco7srSDnVWAHwnHOEJzN12CaurJQ9VzdJjE04p19W6MBRucOu3Z/h0Est6sXGNbxgpVR9E+OW55UCKXqiZf3Y2LSObwVO7TaWA4DecBfJD8ZYPjLpoyJWZkKPb/qoQcr+FAXA2/o0d6RrwJXCM3OefGjMmGVk+KUxY8Y89YPBcCNAb7iT5JHXr+1//XyDUvCK7sov3OBVA3wDheT2Nj4N/+6NF5Ll7zaDeoOHN5gWd5P3IjKuKpxhEeTo5DAfjqhfbrREZNQ+Vt3w7E+lpHl85vm6K74SGVljgIwAmQVLfdAmYXh2jLMvKfOVInucJmVlsgqwkNNhP+CMlE6Mg7VvbAU5wWbkKcnuB+uocWWyq6M7acuE3zWH7QXbyN8jgI9IjoB9s1+rWiLyknySH3pUgEVyGQCMML9pgMgXyGAHRHbYarQCgAkkH0bkeZtJed/jQnIpS1s4ga+QNPrhX17vkk1zdx+oNxofoojFI+QNFmlmsH5EKjk8Ocz7I9IC4YYWvYTrAKQ9sq1MaK7pHuVCYlAurEH6SQXAu0HIhx0lnCFDrZ2gm0nyPU1pEm+1Gxhg6G6oXlXJmRZa30oWt4Di0wZL27qRfEDkpzgoNjnGXVYvOED/QFsLPC6k+YzaLCMh4uZ9OhyhWVG3iMtJPmSB5oWkjHVhrlCmO8JfZGWbf7uJIQlN9kHZN6VCKD//bPE8ebXF9SyOj+hNDlJKs3iZfAyRntRXwhTjxEBnaabRuQZpR5SQGSDzYp1MEVJechQXYTyqdD+vsknPJadpSpjNpRZ9QiJPQFVbTu6Ndub5RbjLC+XzJMdjMcFJXElHq5uEZPBCpSnB2IiHZ8AFLOwfMUgF40kej3bU1CAZaOxoOVnW7N8t+iOT2/tB2fvgAZGSKd30+RYzycEWs3g4KmIkjXYqRrOI+OMMt7MA0gI0haHVvTQH7RhuV2uwjDRHO2hQkJtP7vE6yydZ0s+VqA3CUAuopx7dogGI20xu9yrhcqF84uwhoXkH1D2LK2PdwTMt7I4JWdzRhcdvcGXiFc7OF7KqvqMHuEsoY/9zpP4oxs+pUNU6rRGWfdEagNUHlPMj9B38VYuYwqLEBo4miHwD20vI5bdtNmhMzVAbwlCL2vMCyWkOhpkvTSPNm519nCVkfis3BoXJT+B04gEdwKNCPgf1qMPCknOcpBwnD0Q5QEZRhkv2N8mkLULZmuFM11zRdWdtDdJs5SR6m9mnhPxD/4+Rsl+Md6HsHSMMb81A5HyG6gPzaHaJSCiQJwFAWy/zkG440A+zopnd95RbgdFFwty+msrNDDSuPW+RMkXNs9Hs3NMkt3ocvRO9U8i/o5359pLhVEftT3oAbTNp9nOAyUJ+5eRVIV+F41/auxKjdH/0cZJLdUeKatZqHUzSyHByg8zHp6Rc/N8i4RcxJ3mVUlYazB3hg10C8B3DbSKGmVWNIs4NGL0jbld61OQaj023IM8kAUh7JcTAh7EKY1mRXmu0jaQ5VG2ALPf4/iIr0p2hXTYpC51dIORxOPbe7wHahMmSeCfnhcniNAe7SV7r7NIMVxZqShgSII2Zei25jmRBvJPlZem4TMj//afQV7NqvAbVC47QnN8EtlbLGWwMIHYvlwKA9iGzYyJujWhQGdE2yJL2sF1IPonIzEpSfu1gN5klKbVmtElu9al9VNkB6BemfOICLg2Rxou6k0kk/3RmOZ3kJt1JZhkZ7qEWV07Kuc5sHbT+3QFuEbLq5toRs47kD5qDJuVrgOh9wrz4/xC+dyX8kgZF7ZowWQhFKz8D9QFcIebNEcmn5BMo1CszmsG7gDIXtr1DrGgaoX0rhxcFeaqVzTTmx9cST+dcStUVUE4t2uQFoo6R4aYuYEyYlEud/I/kD+7oW0h+AqcN8ki5Tu1KIUP1akRc1h9OtI8MMtyrNkS/I+TRDKhrnxkjANxhUl79D3GLyMc6VG+qoDDbkbaeFcmA51c5EgtAmyVlaY4eMph/jk3sIZr3IbKxwemem0NSOtDqc+ZE1bBtzRNiYmJTRi+vEhZfoqlNNe8FgJmk3O+Gd56QJV0dbCH5oTsxuSRfc5SYTcpzas+QLPZWy9wxkY/P3Gs6QpSf5OF6NU5rv8Wg5HaCw4YF23wAMgrIypT/DH2KuTIRqreV8OhnPOpI38GyBOBhMS4FgD4G34CTDrmUa2CtzTC5TrOYyEBb4OIzLBplsYTHPDWMEqyqqjJJmnMbQz362KHoiLQicpvHBUT5SW5PVtKOk3zdnaQiki86ijtGynS1eSQP6tWi6gzpG0lm6TVpw2cL1uwzKHsfaQCn95n3A4D2Jckr/it410tpC6heY8r2pi/wgCPPAZbEodlJ+SsaQOxPktPUyfkHaX7ntbnZZHFPRGYW8ksA6Jor+b0ifuZerYYduGPUqFG3TF5yVGjsvT1RaYD5Giw/J80r3UDzg6SsiFbx5JB8wZ3EiJfcmaa2jOTO6hkdFRUVHd1w4FtBF9CjUChzo2pQ3sGDAdK80QPHcUeCTSPQopxc7fmP8IQYl0C1fYiFTTCF+x15j7IoKimbhQkA8CLN6+HAPCLcrsG6UyXlMVi+RTkvAvXzWdAYwHquQg3LgrXnyTDJtR4Fz36ji9WVQn7rCnqZpDyroh0hOcud6FySM9yZqPYJyZOeahkB22luYHCI5E016CHgeSG/hfMrZA6sV5BywX+DZoX8H1RjtjPYHZjCXY58uSxMXi3GTQAwqEyWRkU0Ne1IHmsF60bZlA+jLdqXcr7HAheWyp40YAvfqS1A3zJSlnns+snSRg0zMhpmZDTbTxbGuoIrAqR5jwL+IrnAHf0vkt85SjlNyuVqj5Osiq0ZDX53Q3/MJCuG1ijP16Q5wdnCigsyMjIaZmRkjBfyg/8E2mzJbaXi/VpKLwcw1Um4CXwFLFkg8joAtC3l1lhEZqpIyUWw7p4jsi4ekdEb5UwirLVVlLnAHk6uPXieZFUXu3dphm2FlFnuYIZJFlyk8DlJvzt4k+Qhj5OMIjLYSe18kzSb1Qy8CReAhUIeaVGT0OK4MK+jkzZVErY1SJ6I/S/Q2eQkqA4Mm68DwGxHTSPI8GceAE2PsKAHnBWcD+s+BZQ/oxGp3SHmM7A93yCN67QjHFOLWpskP7BpUpk9euTIkaNGjhw58vYKsjTdHSwgeaie3YMkD7vUyiAD6U7aBsi8ZDVfEcnLaoiqUvR6kjuTahJ6BclTDRx8Hp400nLUqJFzSXnmv8AUBs9RSSvg71ER77oQU0zKbA+A6E0iQ+HMHALr0SXk32mw7BngWq/dauaf4KHEXBlRi3wnSe7SrKaZt8BeW0iaw11KOUjKgcdsOphkMMUdbSspVzkZIZSZcLiR5Au1Cc2rSHPZjJqkzRTKXLX47K067Nub5LGYaon7d0jJkVeh+hz5BiKnO/M8GWLwKR1A8gapukdzwWhmkTA1QMlqCMuE9azsCdveFcbY3mUyq9zsXou8B0lusNL3HdAV0KyCssHrDjoUkDxgo38nlLmao27NADwj5DsOtFXC3HpO7jDJfTGO6o9w7T6PM3QvIiWnJsH7C2mOVrrHnAxFr58Mda+O2B+j/hUel6IMlYw88nWLKY6uXy9y/BIAyPxbKidrcK3TWjL0Iay1LyR0M2wTT3ALMJMioZRalBok5QlYXiFTobyKNPu7hMFFJG3QrJw0OjppeTgDQOI+MrueWjeT8iacan5SHnWiLbrHrQFr4AIeCpCsUWifR2Y3V0jIK22sgo5BylJPNTwwEf+Gnr/5q67yHlX2q1HItToANDhCeRyKTrTbAqSMh+04kaWa3V2Um4EmBlkeVYuuJ1lczyLqSKiF2p1CznEL45UwTchfNDXvxusReQkpn6l9Sf6uO0Jvk8yLd/D6Irjk2z7JFbxW43CjkNs9dgNlKtT3kNLZveZVHf4V0orNm6HoOaLwEg8odNxByunrogGg016G7vIo+B5W6/urSTlwkWZzi8GsBNh2LeJCD4A3hAXemuQ5qdbiEClvaxYXhhZDvV4Zmd/QppH5qZrvPSXfN6TM86lE//yuZqHfF2L5+SqPBOVIc7h4Y5ByvIuK/tThc6yeIXmjStSXoU4Wd8kjaomrxdkUMtzDwWUkH7GJ/kJozNKttFWhng5mCznd7g+ysq1KPX9x4r/CrZIbq9LfDBTzRYvneciqwU3Lw5QjT8Ui8tpy5t+uwTbx9i2kQr+3K8nA7CTYDq/k7kzY+rJY3goA2lXxqFaTGgVUoocfImVRFCITNsqTDrCOlCW61QhZpYaU9aKAlPlC2Tosysp7xa73o2CtPVLEsqttYidWyrpGcFN7uJgseCzVpt287WmwnktyskKzz7hBt3hdPlND+j5xtIk0r3AwgeRbNojbTsqrURa3mRVNHNxqkqXdrXyFpPmAbpNy5XZZiH9D/Xf+CEVPFv/YyxcsnuFRQE/q+HGINE69FINI/V6TRUNgrdW7PV+oImGh5PWCrTa4VIo6wFafJqGhiNSmnXgLNVePnSuk8cvLNw8YMHraKaFZ+LoOAJ6U6cL16VGagq9NKUljbJIHmqfBZuY08Wkq8B5Tgf5KsVD2PtmhWea5D2wueUGD4kXHTeODzKTYuPqD/pTy93S4PPCEiFS8M6BFZsurF1SsiEek5mt0hGT5rGcmTpw06cUpy4OUewBo3ox9PJbp1VTQPFdN83UzSFlXz6PZaJ4G+0ieae3VLNCjgpRfWid4Y1pn0xgZ71HwxH0qJPc0jdagRQ0SkuaxlUs/+3zJjycDJsNd/xXqBfmaShODL9o9waPxD/9REBaav14SD+umh8hd6RZa18WFJmnuEzuSlMJ7dJvrq5jdGPbDgvwatlFazXlt+/GqYGQgUBUIBiqOvXt5PQ2RX52pCgaCBQdvtBuwvygYCAaDgdOLvd/uygkEg8V7N9dXQddSFSD9uXKTYoZC4cpZDaEee/UOI1iQc6bEqJjVXIfr8VfvNihmKBQO/dLDi8iETXuLgsFgMBAMBIPBQCAYCAZL2wLaqt15gWAwf/evSriiUiXjr73FgWAgEDy9868oq5W7cgOBYCBQuGdzBws8FgqFQpWn9x4rD4VCldm/Jdrom05UBSNLDg3ruPlAaSAYCAYDwWAwEAwGgoHgTu1foQN5lcpgmn1UzBDJ8PqJ3TxQbPqlKbvawNfnjY1hksGvLmlp2hnj/CYp2+7yAfA8Heb+brAfWM719exqclyyemI0FBOSraPsvMn2CUhMttWU0D9TCYjrdf3Y8eNu7Z8M555zhz0wftxtA+ujej3trr53/Ph7rmwGWy0p2cUkDUBisnWSGq70KGhJyfZJsE5MVvRYeTMcpms2SEq293mS3UzAv+IVNFqqPMLTMSoSPrXuuRYaHHomFDLv7WMmSfPk552AdEOhmTbib4M0/x7kTZkvsvtc2J97XPK6oE77PuZoKss432s36eCkBgB86Vc+dENbnwLQrYqR5rYrNQDIUALQ6aSQsj1I2RQD+/hTrOyGuu3p8gsU9YN8SCFGB7q8u7XYJCmVBxaP0G3QL8jQ/0a38QCIGvn1MVFoCQAJt2QLSfPFaNifmy0lV2l1XEvkU5XEEC9VgOfCRQGKUXZi75FigzR3joq2whWVoeGAN3Pou6eEpJ0cva8eANSflU/Kqk52g06w5CbUda+Tl1VamuyhUH+J0Mz5vI8HgD6HEhb+0sAKH8jx9k/uZmS4wLQjmX25BwCa/2GSldd5I/RbAlJ+Geq8t8uDKt1NnqvwmEjRqPqwfofG7etFTne2it0qYUZWzO3X3lBi8Pc0AIgZUUqGP/cA8fPCPN0edd+H5E6VviKtFSYzOxb279Do6RkTksJLLXCTUCp/e/mSZCDdJqkogsy+G5Edlwnlt6aDN4usaYM68MNyo4NWCs/zKJTMAYgqII81sYjay8WpsLRLLCLNnJOkMSMOAHyvV5FlQQbei0Vd+EG5T+UCkTbV4isg5XdPBK6Xk1GOcre82C4+dY3Q3FQfALTBJSTPXKihTnyrPKrS0WSnavEep2GE77VoXGVeq3BHhJagA4Dn/kpySyYiO+8h869G3fiv8oZKY4PnKx10dpQF37GsUYT3ID9WuD9C8cpccktGBJr/LSzpXWcVn5iYGGX3vcxTianiMKUDbuT1Fd4Rgafkb9fQsYTMqxcB73phVZs6qpTiQKAg0+5N+V1F28Kn3Zoa4dnFPN9y+d2itVkR65LW+MV8kmujI5DyC7mnft3UIGFoGOzvZa5XAQu4yufSmxH6Dubp15rBJhHePPNSizS1JsOnbgiQYlBmWKDlPsrKuqmXKBOgeAWNlip3syi52lpWmbdEYLu8aZEcttLbXzVtX4iU0LGlw0eYDI+wQNM8mo/pdVD6TvMtTaUD5TKVCylDXJOrreILZKrFGvnJQUaVKaRZ9UH3GA3aa8KC+ha41KBxXh1UV+P3GKjWC/MFlbQw33CNw630zVxs8Q2PexyY5obZo7vGwNLzN+UzzQIzyXW+uqfn1idCWf+Ty1T0Zfx7X3XhZf5l8Tnz45wEE6Daq4TGxVYp2ygP1j2NbQ6HD8gprwI6mmZFtY2UU3rEeyxNcRSvhDeEK61wvvCAt87JeeMy42IVzxGyOrawMArpocr4iBksS62ezCqGLrTy/iry7H8rvdVVV3fUI3r+YyV3/j+HbzuX6gqYJtWhrY+Izje6R7zA8gbVg8eF31vhnCKeTq0d185Y7rfM8mf5l82bNf7SFIUGr7z/k9/vz/L7/f6srCy/3+/PWhWj1ufNr/1+f5Y/y5/lX7Fwxn2dNbv0Vz/5ye/P8mf5s/z+LH9Wlt/v/1SzaTbjeNgwQme+uiGm6V4dQL+pi9Zm+bMs/VlZ/siJAK6Y8b0/y5/l92f5/cvnTbmtudXza/x+f1ZW1tqVj9pduGytPyvL/+MtdrNykt1p9/q8n7P8/ix/Vpbfv+qbOc+OaqUr3DdrqT/Lb5+V5c/KyhoEaM/NXu2PzFo19zmvK+NnLfP7/f6srCz/6kVTb21sdfespf6srCy/PyvL78/yZ/mz/P6egOeJt1dn+bP8fn9W1k+LP3lpeLJd59e/+DnLn5Xl//Hdx6y0x95e4c/y+79/sxcwVc6kqqQWVFNRNLT98mDEiyxLtXnApdRinom2wmKaQ2sHEPOjkKFj2374+PM/DlWSZbPb6VYALsol5dCmvzdt2rRp87YD5axKVgN80w1Sjv35+Rcbc4XGnHQbAFdWkbJt06ZNf2/atGX7wSo5oFudVyaHn+vd9U5/sVRWlUQA3qcMkls3WW7dcczkIkTGzSNpHPrl0y+3FpHBF+Ij0HhxiGTolWgoxrwSpmxsDduMKo50B8AjQVJy9/z06SerdhcIjfUDYm2AlOUkyzZZ/r11Ty55KyI7HyIZ/LgeXM9YJ2To8PatB8qFoeeSIoDEZUIWb7L8e+vuHJGbENnymJDle1d//P2+gDB3qM8K0MYHSR5uC9Vmf1E+iwaAhlXm3SqYVE0lccA6To+YwbIUm4dd0lbTvMemr8i22oImYfK3KA0AfBlfmJTgW5odXiVlJKw1b4ey0DlOoO0lQ+kAtPh5QjneSAHfkEYarDVf8/xsr0XvKvkhBpENfiFtkHKGZCosNT3q5tAyCzQX8ngSAD19nVCOpERA+5rkTg+Ute+4NQ72Y4WLXcMaMtzKAwCehDvzKebWRnboTXKDBkvNk7BYxlrgHpJrUZ3nhck/o3XNm/4jKfvjLJAaIpdpsNQ8se/JOAt0MshZXgDeVicpMlu3AdaQHA/1i3kmDpafSU6KSqOi6ilLAJZyZcQcFiXajHMJ/Uwe8lh5tzDcqbZ4csgs2Gr99pHmyhi7O5UA9Kxs6whZZCgFkb73Sa7TFCaLCoBb86Mi9LWsyIR18kqxizqiEvnFj1bJIfJYHCITfiU5X4/AeQaZF6Pm2cGrYK9tIqs6uvYWGW4M2yZfCuVUF7uWSgA8BydaXUby42ppUUn+oQFA0hKh/JligUIVAIm7J1tFVZDTYdn8MClPKbxNcqCDdvxZsxpo8hYV34FqwI+sSAbmcZ8G4DPmxlSX9xDDrazwPDmmtmhHlIB2h4SyONbmFifR+85ztloBmZWkOUxhrJOoQ9ERPQ3Og33CSTvvQSfX/G4VF1TAuZWkOdgCK0m5Xu3c0JEohasMkrNde1UN0Z8aZHE7m0wn+OI1q4Ekp1RLswo7pOSRvNcq2wGefcPKV6aAx4U86rN7jeR5DlryB1jrP8vhGIXYKj7v3ipW1gemMjsawEKe0KsLC8hLbPoKv/2HQJMCkne7pS2+qFrwjZDbNNfwVVLEq+RUBUwrdi3lJzfwG8k5VtcIuUlXmmiOgOK6cIA8otcMeP4Q0q+7df0UlddqCpaS/NOlAbPdyAyS5kV2L1cLelTKdIVMk+PcW8pgOjCe+QkA/sdNqLbHySdskqp40gM0uq5x7cMEIXMbuYQ4b/VMFLI82r04LWIueSZZoU2+a0hw5UuS31olniHL05W2nKqnEFe66lmheWsNQfNC0rzTLW9sbXiSZHm0O544N3xFpDxZQ7yLJL+V3WXkxe59z1AmcBtL6gH4kV9X30Dh1zZYRaNTzLQyBt7Ua130YVJedMcHN9WeFrLE51YUrF8WcobXzrvDJU2HrYOFJBdZ4R6T8p7KIPNLTWG23NKyjMyOrSGYQ3Kd5ooH9jVrhJBGihteHbZqUcWkjK8hiDkqp5JtXmRlujsyDFjIcDtgBCvSAGyUKdXXKMw9ms2jwueOiFloyIu1Dm+R3OJK7JLq0vykrIFLLXfrVt1DpHydZoPXNXfOv8kd/W+SU2zickijhZ22srIV7BsHj0d71gnZu6b0FzKY6cqsqNpxt5ClUW7MG+hO5xBpnFtTcLPITCt9hyyAO+Yg4FOaXYEhrDoHwD7zYYu4UDV481jsselhMEjz7bQV3OytddeRrIx3o9Pa6uoRJsPd3Op/yEZbRVJyrrXR4M5jt7pzaZgMd7HBfFLG2yUXLIXi7XI30DtMflBT4spImeyG9kt07fiU5Hq44Ns32J3pQu7Ua4w+leHHLG43g53cGgC8T7kQ6MRgc0A7ZQ6wiK4ObGawnk2zSjI4WsNH3Fr7WpmkXOHGnF+qKWMDyW/hkv65HTrlCEnzp0EW9g4anXKn9XGSL8C+eQW5P9rmafNmBe/ucGMA68iqNjUEa4TcqLtwdVntiD1McowbvSvdGV1KmjegxiBlo5RdDsCzU3ZH2x1SmWoxgxwCNGK4NRBVGk6vAWsZzrRKfCYsx3oCiYflW63WxQdIjlOY2DPyoqtnh6onYeAe0lyT7OSSnj179uzVd+gCUwFdjglJBj/qqDka0rNnz569+936h7hRf1SeMPhNnAK+IuUmq+SS3ASFUeZ3GoBHhXyxpswR8pTPbkevnj179rxgyPjTlbUi9n2hHEhT+K1Xz549e14wZNwZcUFr8ng5pephrQbBe5zlXYB7JTwEdubnPrt3LJ4nhwIJpnEukGhURdeAlTTaWST+SR5IBXCXGP1R63xnSL5up+yaccuIsQsrSFaN0eBAWQVevzDSnOlI0UneDdePXx0gWTgcylcLudpqsDwDxZWVyQBQv5LcrtWQZ4UsiLdTrWkbdADR35EsqA8FZQdLht84ebNJyv50qNYAnHtcSof3DnARFCj7rnQwnrwFiAsYnYDzJRc1YDWNVgC8E86I+XEqgL5V/Ar/NDK5T2S/K5eYrlFESC7rXQ/qY4XGlX369OlzYf/LfxElRF2bLSQph4c6uLxPnz59Lux//wEnIiIkP+uRAPXobWRlS4tvqtopNCzzw3IWKdfXil0X9enTp89Fg18tqWnhU7v/2lokDL/bBCrrLuzTp0+fvgOfqXIiIiRDY9v5UMPQM1tKj/BYK5WQwaqP2tn1B24lHwJiKswuwC2yyyo+xIfd+5WhhtAGrBbJHusD0O2AnGj3DxBdRnK8wkhYa5+4Fu59bteDZHEvuJAG66gFakDyyzlCkuGJaqmwbp7r4FS3dleEyRON4HSkSVmsA+gQWue10z6S6616C7nVVzOmCXnaZ7dBg/XIshr298Axr8yc+fJdzTUoLdNgPaDSwafnthsXpKyIRY1D6zwy3Bf2r/BAvyNCY3I9C6MLcBX5MhBVbHYDJsgfVmkG73VN28nKmCbfmDTXNQWApielrBf+ARqFSRnqAgZmuRVKAUaFyfW+asBVToCM5UEhad7tCt50cCwOeNqgfOd1Ur+ErGoFYIbRF/ZpuUfrJVmmFpCVzWrGN0Ju1V3w7K1hf2hwrhZ73MF0AEuEHFcLWuYwMEJTmMJdSHgiTCl4LxVzLPqQ8wBfkfQEZnCtVTuRoa5FlbF4ZbnwVB8fAAytkLK++CcYIGQgxY2k1dWhvU7KAq0azj3gCHrrbSR5poErl7igrSRlghO8LZSJgL5/NxRvM4OFhQUFhYUFhUFS3qoR+gmSL8MFzP1nwQoXUo6QFedXVxt+40C/O1cq74XqFG4H0GZWCZk372eLZsK1gCdPLoC2nEus+tLs5Forg6QcezQVAGJmBXjqCvwjPE1yh+YGUqsD9fcIA5dWg6chrNPa2wBJrwpp3uWKL84Zmh0mC89zkpJPnq6HEcabCjEHQ5OfsD9NVjStCR1MMtTOlWT8s9SLdoarwuROr9LTJAc6aM+5am3XimRfCwdbENn8/VNC0jgXiK1gnh5xGbQ9nG81jsVx7iT3mXKGNHdOjgEA/YLtNDe2xT+Ctp6UGXDFXTs0zCOL27inOGiuAvQPTXKpK6oKuDRMbo93gPkk74raW9pY4WqZDcU5Qj5UEyaR3KS5oupGdHTNU1XA82HKFz6Vh0je4uBCeUJttHBrCpxstwC8jxSQ4aaAtoThTCtPNj+w0PzyDVzQWnxUTlKOX6Ih0jNLyMUa/hnON8jKTPe6eV3DI0Ku1KpFuzgRGLRZBbHZ5EHNLa2HE7wplC+c9DPJrFbBj6G4oLyZSuMq8k+9+vTdpDwK11JbuPVQh9rRuIOT6M0kr1MZRvJZByNlhJo3W+ZpDt7gPhsgeSsDCQAeojzj9ebJdfCe4TsW7YPmdQ60qL7Prj4WFponX+zuQ6T3rr1C8kb8MyRsJfkYXOu5z+ee50vSnFwtPQ9HAYOq2qt41pNL4dYzkxwlbCbNaxx4fiODq+UShVblf/pU8DVpDqm+GSa5Pta1qN/bu5S+Mb52/HytEzQ7RZ7poNAjTC508HawqxpmSHFbB+OYrRBdzjwvgMYhSsmGgLzRu2UuZ1rMYElju6bdLn/4rd+LSUrorxmDvbCMGr2OLDEZaPrPEPeRUH5JcM2z4n24h3MOCgt7VEPSxnsADDK/0lT+oNzrVrdwT0dok02eaq+GG0jyaJyd9qF5BZSHCfl9tV1VQZb0gGv3H4xzacoKzdmGmnDt0VhHuD1M/uq18+wQHvQqtcw/neQgOVvWRat1lvIkuxYmfwOA2FMUU0hK2OT+2U/dfd1lJ2UBbCRokhSz6szv4xvANvHSIyLhDZeHuUurJfoxtbi5pGyKhe2tTrRngm0crSFD9a3QqZIsbWr3sNBoqKK9XphsUdldIfkU89KtDjlJ+LMwzu54vBVuM8jfotVSy4XmTbBPyj6oqcWXkUX1HL2hpo8wKCU9YduM5J9KHYrfQuRgkrOV+lXeCfXmFeRO3YXT5AqljqFXYTfLBnOEMsdjg+EGZaKmELPSuA1O7xGZoBaTL0ffPddquPDdCO0PGje//HO5KbQWU4ob2JE0A5vfurxVPR22CW8cNSi7e0XfKHwbtTSuUqnHZpPyRT3YP0TKPQr6k5Xr4XgTKe1stFeF3FzfZpbQ7K6gTwv+4bGQ4mttopaL+ZBmEXuSZBOF2FXyDCIzTDI31cb7qdDMilHCk8K8BIU58jUcfkPKT14nC5RiP6siD3aBfXuS2zwKrY6HW1qMJPmTgv5ASWmyg3YBMsfnzFNJbvEodD7K8y2SQ+QS3Sa1mAxP0GyiVwiDN2k2zbaaizVH0d9L+XAlLCUZ2v7+denQFlKGR+BOkS8AT2av4fdPfH/Jz+vzKO/BLnzf4LbxUM0cs7JKGFxyhQ/aIsrVteUZIc+8/cAlfftf82qWydDPw7ywT/uL5OFHRg0dOnT4rQ9O/1P4jKOB5SSft4FnBcmdo6IiWmSTsnvcqKFDh15367i3NpnyKCzI0A9DUz16zOVraEyG9eBKkt/dPWzo0KHX3zppbo6UJFjcRjJ4nQ3Sj5Lyy2W6SsIp+Vaz0Uaa3JKslryTpDztU+uSR5qLnr6mf99Lxn9dLHL08VTY68+RrJx5y9ChQ4fefPdL3wW5EZG+b0kGv397xrQ3p8149+sDwq+hrr8kZLCnI89Ekwy/d/OwoUOH3nTXS4uKGUyKiFkkZKCzDdrnk7Kgs2aB6C9Mmqtu7ZCW3u2Wr8vk/WQ4b3hIcnsq3SUsCQml/OdJIclNtojNYVVjKLbL5Z4khWA87LX4jretDFDMk192AYBzKliYUiv6P/JVwLCvyju04a2usE++/5UTYcNpqJdax4fmlBmGYQS+f+QyC7TOMQwjdGzuJfdPP2U4Lk612N5vzPITRuXxo6VmaNd1WkTXcfOqDMe/Abjgka8ChmEYgc8e7mOBTsWGYYT2zMq00xYEu8N62K9BwwifnHuxXeJrO8OGYRjhzZOibDLHvJFr2IeKj+74akQU7Ic98VvIcPwaoN01aWvYcHyX0vWPrQwZhhEueffB5ipXT/gpaDh+F/DcOOGXsGEYxunp9zWxwNMhwzAqN7zoi4A2dndQaASDhgS23+aBmw1yaA5W8R3i1iZTSoUk5WFYf0jepdDwJI3ecCPx9t+FJGXLAA2W0ykv4j9yl1sAoMmz3y7/36Qm+Cds9ib+D5o46p0ly5fMvTkJbvc6xcppHjtcKjIH0R1G7SdPp9kMEu6q77XpViVfaXYNjVBa0nkjXvluw4mwMFLG6rD2HWFZ6/9K/0/cebuYmy+NtvF+ahqzE3B+mKHbYetdL1J1Zt/6ZZ+/9dLExw4w2N2uXpmcrjJJUozDP05dS9mZCNuXRJZ56tSgfRsgd1xZ3xsBfC+yZ3QFZR4U+4bpcGOcTWw2xagozNn2wYj6QONSVnWAbSthSQbq2D2D94oYZzZ9eOeVg4c+sNSgmOSqRJXoDRF73plfIjn7TuaKLLDxbOTW81unJ2oAkJYt8pFu4/mOfBt17zG3rwpSXdakQ7lFHsm9HqyW37ze2HkSfjPKAm8zOwXWsYvIP2Jhe4/JE+fUwQFo/OjynUdO5pyUiIqP4fRpIcPn4WWWpQP6GjGnJ1h0qDJvsfK8Q+Z0gm27XMoI1Nn7YmLj4540yfDFuiPvalLmopdp9AWQ8KtIVnIEvpHi9AjPpwalH2wTj4v84Km7s74/RFnbyBGaHicP+PS/5CsAqD/flDOvJgHoZcgCHUhYZLD8Ws2m3jrh9mjU+d9aQh68QHOCVqcYaI5xrGoBAJ6n88mjz/aIx7OGzPa2XkWWjYFt0nfk0Q44C7DTGaF5n9cJOuTJh2hn8vEIoMXvIaGU/PTMacrmIkrgJtjG/EypGoizAjP8pPF7IycYLcFm2ley2Qre1jPLqXiiC2zbHxaW9cRZgkmvmZSCx5MdxO/jBLStNB7P1CIAJF/+9NJwhPlVI1jrd+WSR4fg7MEhh4Sy/UKPEm4yc9J8WynBv567vHvrZi3a9rj2oxyS5okbYa01X2FS9nbE2YSx00ka+zsqJRbLIkwjSREzFAyGTCHJkjHRsPZOrxLKonicXaj3zxIysOpanx0urQqv2cLyrQHaS97CkfVg3eDFI0IeHI6zD/UbNpmkufPxtpoVng+RoSl6xuBxU9+bO3f2m/f2ioe1t/ubeaQUTk3FWYn6qGyDpGy8Jt4TgWv27BgBF/X4a/cIKYHFiThrMfmyn8IkzbwN0/vHAdA0OPad99JveUKyfE5HD85m1Lo+v8UQkmbxn588c1Pf9qkeLVKPa97rqife+uW0SVJC6x/LxFmQnd/bV2TS3sg7sfvoqXKhrZQdeL8dzpaMzrjkgyNhK4dm/lfXNY7B2ZWec7oPH/vG1/7NB06dPn101/plcx67+cIWUai7B1ZQOCCMIQAA0IEAnQEqSAKAAD4xFohDIiEhFPoGRCADBKbsvi09JLjM2mkcpsQdy0zgHxnmQuA7Z/aA/mfUAfA7/ULCyzZX8B/evyj/t11DfB6brvZv9p/ofNo5X7pvRflT4uP5nUN1x/w/PR8r/TP9v/Wf7j+7nzf/4v+b/vn8z+LP6c/2X5////7AP1P/6/+C9bP9jfd9/N/+/6gP6B/aP2G92D/R/9H+c+7L9kfYA/oH+L/8PtC/8D//+6P/d/+l7BH9B/xX/4/8Pu0/7r91fgh/pv/H/cj/ufJB+yX/6/4XuAf+b1AP/hxL/+E9F3zfplfpuDLJ2/F9w7s5/jP+7O5Bhcjv6a/5dHffMzEPSY/+PIZ+6f/jp5/YWMxqnBH0O5kZ0JuBiPAm8np1aT+TeDDMJPtvFSYvYxvQsc4TwGOQJ4DHIE8BjkCeAxyBPAYyoT/k47gr5QLqPMIZWIysV1340Ye7nfjUULKDkkC01rteaJW1fvioLi0JurZsYr7LtfaHcbiQLFYW7Vu70HurbTxYWoEKbVIG82LKmD7j5SCoB9y3cHoTaXLjbqFmumNUR7llyevyoqHfo5KcdeuKL8FZ1L1AxUOngeUwKkWujcQW+iq5udvW9s/HmZypV6koWWO3uabwNA66+K4o7k+bokJ7yveEW2XU8mSVeSz/MY/hXYnp8mERMu1Xht+kmJteYbYsGyHvZ2zcfS8ISSL01j21iY+vaJN14Wsav9lpybI4a5szc/IpAp8aIAhLkrNbaxYI/OTFY7FKh/3FNt9Fp2AP1RBqlARwTfB9sUOAeLVgHSa0FNIxi2fC4F0STo4eqJVi/tMnf9v8edCqKcOFVUQ9QhwEjU2utlxUndonXzmiKfA0AVkrzqrHJon52vEpf5nBQfsukcOxNs13LOmrjLxLg5596HIXANjZWxDAPO7AGXyesWQ7aI3IhVEzGYALM4LP6Mf+NOkY0Jcb7djPJ//pwimDg/vgQT0YXzLSQ4O7HvN5TiCBvvrYI2+Ajk5YQiXk4Zo16Z4juACZuxHearPG9MndyHdVUGka4FiJe6OXQhr0aKl31RqSDD307Kp6z64lFPBbQoyW+a943x16x+DA5PZIIxuXZ4Ub+Cvhjy+ffbLmT8dNzBZ6ifXAwEkdr/y7Z/6Jsu/WqyuBDH3dsF2vaVIG3DMctMmvJ1gaUobkmE2LSwwm2DUzNfUf0sJSC9jo/rmLWOLPxo8xdXPrhYW5gmFb38MXAFVb6pnu2IZarC+z/73COXFTYdWCoz631ER5Nhw5cPolidDnFUh/ZRenglZZe5Q+7MBTtek/smh8BRi9kkYLzk0w+uvwy+jTrbjqlPr1s5nrld2Rrbw/0B62vdVWjWTd/WYiw/WDddwFZihp87mIEL05h9IAAP7uyGEFXZNtDh7S7LquAVb/WSTNP1uCMBhacZo/s4eFx9sKiGjlJ68Rm4H7fNjt3Jrg0fu4mrPGIemFDO0t0TyOKVdU7ZjuVpeX7i1TzViCJDL5HxCEJknk5b4bnuUK2o/3oKE9Lk0Q7HcudyymPiYdEu6sbsxkD0N4s/iymjPf/ZOvVI7OwhBO/j2aoBqaQgkJVkzqF4Y0A+RLCkeFK0JK96SqD/sxyqaJRzTOhTCTzxqNwllRV+1X6LSzd0LFk/q5T4KgiSKCzsfpc7bPnc6lJc9OshtDxSHI5LPofULWqsgHzJzRlSFU9sh2jHzeNeBnVXFZBAuURcyyVfd4RxzLXQkvPPexyqXMoO4MMZfP8So8eZFyJlGo2VFwQirjIZAUg1jCPfS4tWUEgr3akMxdofi861ye/XBmnFEdiaOG8bZxvfILQq/mAAAAAAAACcuaOF8eBwy2CDp+SWMrxCPb3HvXKUqkM8pAx4He/GmkkweeUZM3UNSZ/kJayP82Bk/OVuj+Hdbvob00colIfPc6MVaBXKVAbqkhj1z93fbmNIRMxMN3IkjZCeCgJWNHU7jrXbxxrxVMt0l+cZmZNBMWSKq6pMCgaAMq2igLFB8yu0jETUpQadAk/srEHvtjFHvJSj6q6f26dfkyCV9FR+1eFaBs1S9ERBqx3uqjVf/fH2u95XA8fYZb5dxBMj3WosDPdW77rNI9iV18RadoKQNMGs3nNGW8i9zLMQ/KN1JhUCxEP6L2JeDhshL30D88/wSy4QzEKAQLmsR5KHVEXDWEFiW3KXHayRFv7rJjM/K6zRsR6YXvqgBHAgqI/L03M+o/5fiSX2W06LKEsuQIZv9E+p5Nr3RUg8ldnP5PCVxS+n/TwrjcnYvhcRszkMtYlSMJVGBmp6SEoFp8f1e0wldfuJxjAJBtr/j3lk18EeJDwuPS/rXk6Gr1KvbUAWAG5jYTLWwH2tLOi05nIbneY5bsbxuh1xUVZ8GurPyyWN6vCWqB1kIR+5jSVKiFH1kl5o5ImE2RZXfhcCZpWHK4Us3mGvDKo9nRe0WVTp9OcdO9gGLBT9NTzjnhC/c2UIhdpymHTl59ewIQ4PodYeDDjPbrQbyGWhEyGJMQyP2dDlkE2VDlMQJvoPyT61EzaKWrckpZ+OMmL3GWAgQAqhIiK2dF7RZSNjEs464ogLIbuGQ1hsCKzzn7Uzl3hd8pd5UnlE5jMhIjwFXWeLkgoViSBOI6J4J/alyRl0C4KzbPyDw+2annHKWKAi6hbKlVkGOdegLiMNUgSFQvfMEqHHpIaC9wSx5b5WeUj9YcR33vA5qsZJMWfdR3Mo9ZYBK3o+PAht8HzsakABcMmizV5XmvwBioC87TuaPntCgr8ETKJ4qiQ44WCQ2cJJe+svDLb3kCAHQfbRNdZQZThS7RCnrMuEfFABZOfloDefhTRPEjDV2dk5rEpvzIpCxy5i1yyB5pJRrLctJ7c4ebbJg0csg2kMEehdiMlA1aL40CkvDqdbd1s0lPHSOFl4CQhZwFTkzQC89JE53bKixg6rmMocUYAbPcr3bxKcdG62vGaAK+XoyQz7HiApfsRTKT0Ysb0LCk7+GQmDWUGK79/JjUA8KwfCBQUipW3iMWyIwzJdkZSRGkr58Y3HJELyFM9woUxVLz501iep+ZTdBrnCZHCL/Gf63WNjUJsUK5kHcevobNGC8Iws+tq6rs048ScfmSClfscHo+v4aQlC1CnhIXvSZcNRBSB9gIubMQh7Qq+d3fiv7mJw/FnufgAim5BNQqayxq5JK2CsgIYBHSJpdiQYozE/94iLoFVN5ivlkp0NzYXMjDHNTxjKpgfix3vqwBq/I9/moc9xQb/4x0+tObIYLqHUDHIesFy90AS0664g7U0DZGPiGlRRpDe57+k+aqFpYoELMMwH2gC0mEwuh9H1JJCqEisxL+OS5spqyFfM/91mI8i9BVrBu2ckzf5ml99gheY5rqSszIr+O5aCVkSjEg7sHFfVKo0m+uA0wE3P8NLj47qvzMaNC4hV80zNKEbfkegSeUzx80/NjoVCRx3IxjitQTal17jcw6TyqO9itH0CGCapwnAAmvVGYRQAxbOLEiyM5HLZjE+zlP/NwB7V5FHYzZ9LrLe5mzWvMyKlB2aoyfJ3ApquqL06WSz+jdrA9vCrInwuUzfrMdSRdt5Ota1UWEmBY++1gQu+CNNvPahtMwZX5zuZek7SE358AP4vvgIk+NFOYWXzChBy63Afzbb0WCTi5Qj37AqotozRnrj9NDVV4lYmWAiFOYCFEtHfTLP52b6eUy8Mm+PTvvltGwhI5pwBrsI+UmxjkGbgXuXaKk78obgh1pb5+9iM9aZHD7IMJX7KGUQSdi7Pqbq1qiE5iCtCUuvicftHkLP/YxJNQt1W1WRJctC3mcav2gEOnnGpFdl+JSWI3a9Ad0lCIFXDmmgBRqKFr3oSJU6kefVN2tB/Pfd5hut/6UYNMatZJyZOia3qWTW3Y85dNFevrSzv/8Yksf/7y909cdRuT3Vmi8AV5Ossfuf0ZahxM66EWuvFoeyRtRTZhokPBxrSZkqphi6xTePD3XzZz5JDzuzdi1ZBVO+lJeFM2ZWGZwqD7d7SGHphZGJwaTrWJD/mFDjS6GE8LPlZghntLyQS+TdgPuSEeUroNbvnzBLY4pBlMnq9Zt7hkh3WRNvq63KtqbLTBZy0uBw2srFrQnobM6EGzkHcAG8Kni6WVSNC+be55mhBehW+fOoypHvKEuuyviXgf/7vomG+zRsGhEI4xlZgzdhYjgj+RnkRyd0NSnncKbtzUykMKBDQU3TH87KeeFnqMsPxwYaQetDoXy2RVtzJQF/ORqoq/29druHJR9aySTIlugAoCb7iA4LSXflycSr0QvrzkJKoYOqm9+sNvhgQxwtv11LknSFeL3e9v0/grW0wkEZ6dQGHANEvLcSkU+e5IHOgYalFh5VfaRlvwB3nIIMmWj53g9CU/XFhndh0l9d9jDl4KJPSsNYY69j0yR4goSPLZE9NXkrsnGuP5Iygx32ODdPVsEZDvDAjHaxZsBTftOL8sAAS+WLwp+XBeY/6JTRz0iAsrmIv+gTBC7DSyuAOZaVtDEGimlhmjkd8mCGfPCu4eXDmj/l33lkNYjIHmDcqsz/gDVgVaUJKplcJES4eoWRAEQJNYww3cEcjh69ZGmCaCMK0pCJXcEtl0cpy4OzDGELZ34Ea8PNK8ul+fXPw2cIhJbP9B0tPbH5E87QNP1l5dboXQhn0lWdpfFOZZ/V9NQLHLCm+5ne3ivA+uBfl9d5tmQJ7VQsnTQQO83r+mpeBCBQI3orqhwQ1e4eoeRuhhXTVROEBSDvTBJ5pQ23rs71H97vE2u3HsxvHXAy2XGZb1LuohJOmgSsVkBocSCh4HUNrgMrty21kBhPCIIzm8vKVKyRJZ14cLErLfWRwuSOqUGxHdPYqsy66W+BlVYywhxw+btTCRJOu9MbOoYUKYCbBcKl5PAjOmUpSQwhT4KcocgisMBF5RUJu02/cV5VAGf38X3neC29KqrybKUKnBbAxXBOPw8WUDOHlYtAfrwhgYUuiYutpWSWL5DWFLAcda+J712qUr9oH3bepp3EdiJeWikHU1Aj1USrnxByGHENExmPgvS8Fiik5PnIE5WIUjjmZCV21TBDIP0XONN/z2LNgZySOSoJSrrifNKz1JNBjjQ2OzgjaweRYhsT8QiPco4HTJN/4LqHDBo5QRUNMjn5r0nLy3AkBK7MrtEBbalS3zyP0ruwpcdCjaHrs2gC4rJBwsbs+0UI6Xgh3Kw7T7cT/S+t3DpqDiN3mWL8EhDXGZM5ptJaoNGwShOqCPZakQxj+EEKdJ5JB+amTPkcOhGEoYblJHIDOFKIBhAD4cNK7r2xv+5RcUuGzssZdL1Osx9ggGJa+fR5fYTevJDo92TKZ27Su9o37dTd/eFHSQ1OafXGAqwaH99IJujVf64tvlUatO4QPZHIJmzEnJBXOiaqbkPJ9ZpWyLhoJmVzLTKh5mS062+uGUoPyZ+2RG7sm/A1vV5wUN3Gq2aNq/4KBAacDnnuXsa6TQQQOM+Qlj24Xj+sytlpB46TtjeQOJ1PaQTNKEkAXDEM8Z4pWZR/kmM1uP9W5pDApUIRaFNlCvUkdu60NKkKsmCNr0+7vpB2NBGyDJRz7EH0bGgh058wanVh87BUxZlCUoNhGo/Q8lt5aTUEcxjcA/kws+u/IBBLEVuvClTjWOrUmZv+PNYH37FmFs06WrkwrDP6aTV0HnbnM7JxwFXXOLlkLBSz1cUMZHtjzrRiF/o7xyckNoG4Wa/Wux4npJyc/igw/7MqWnrgp0ffuoETqQqnFFnvFjjPHeKnefVkXGz7t6v+OnqcQPXMHOMVoxMoC4vGZNVQac2+fHY8SEafhdUBqj+L6ZBMs8V9FvMUzmNwEvCC0vG9iARUImlZhk+tHBp9CZ2A2qivMXsWQOX/i4sufC+sOuSKpwBgjaQEPALnhB3RjEbBl7O19Qk51YDbAjQ4sR8dZb1t6sx6zmbZZ2A8BU1PJFixbTiy8NwaoRW1D7+xDKQ0g+XET8J+iQiqoiFH/+sGF4xqNEd3+Uy4ffMbF3LO6YZr+mr0wQojSs69UsZWaHV9yZwDG8i8BAOycjZcXoiEZl7NtOdaiywBBUzdFdgkx/9R7th/BM2JKDJhhvqlb+xJwoVyJXQV2IKJF6MNcTKcUoB74PmleqUVpH5DbxlzykzYLnxc1ktLQX50Lm1T888hJ7c+gGAkU5B+AMS6qm7iu47Cwm7UF4IA5NOrmRUevqXwr4ZKvgJOVrtSvgv88T3sDDR4qb0SBfhMX90Q3QmpAA2Tlbz2bP3X2+DLJcRFLQI8Yi1SwDwelsPAjOHduktSiqXnNTSixNIN5RjtUHB/gNL0ZucKeROeje2wC0AgDNCPzLf6hosuTazXkYXNOWdkske4zQzpIkBpCICfOg6QPShV5Ysoo0hzhQ1A40Z8zIdSuSb7jY2x8LkyZUrEkzvZdLcHEBx+KX2NNSSj8cBeBFeC9Kt6C2034IeR9rNNXVH9Z0PSsf6p7h8yKo1g2770/u4NZOjTjFy0wPn2we7Gb0AK+BRKVDtbm2OZpbe9exENkopg6Eiype/ppDgbzSrWpSYlBIfbpbOAiOWlTeCpZCTaIhbezdULltxO6w4XeMGOapEoV9rqlyU1DgL8lEFlAAJD/jh3/pqVWHVes71YyG4kfht/kpfu/7eZQM8LcOae2P7ZSrFPcdTwvxzfAqemScCYtRGaTb+YsGLJDpB7sYb7hcec3iatGB5+SIR02hR48NBEYmSu1MoYF85RGN+YW+2jSsGwbqTXoF6TrKdz+fMN4mVJ9G0NidCdfRlpagftU3m+7fWvqi+jqBfLRiospyDmBSyuZsi+5VvCBfG9wM8XmMv/+ypQBO/COQIPd6ddHZ+GvQEt+Ei2UrlSuTmYxL3H2EBJatVk6GsQsB49wTxx5vHYBxs1EVAeSTwXJs+vhLeC+EFI1Bq0cYwu4+PGtrc0yNaPrb+pnq2fv3BGrBpttvmaU30rJoqI39kG0QuuHV5hYHs6petNxv/iTVxJTyIRYd2IdZ5kVad05bRnoLuMndIYhiEZZw22NdFHHzeBoRak4UaHvYAajfRg3MmEgwo8kWScCdY2/OR+j2go/1uVAVEupg6geJNLIoEho3RxKPGw9Ajr+mybm3WMlcRPaxGgckH98nQhQLktpqsSKCE1v3bhhq3oV5uKXNZXLZIt7lZqpUvj14as3HHKNYqC75rZuOwckp5V6ipCk8wBLXhX495WqqZw+eAFGo7pregOQ+Vf2SVb7Lkz2xgMdNgLlSGwnLi2DKp1bPo2qk2SUx2k9gDT6WMzVkPgfVC/LFncXw4W0NDr2kjXbO9vOuVxmsZlmFzH+oNWOMgexsFJPp/5jVDu9so4Gts6KyZB/2Na/Ah1ON+aXwqXKZ6MmKE/WDhy7RGoh3/UIChP/fSI4E1z7lLkN1u/iBsBe7VZ2Pypmm5ypsdTwmLxF/M4Q5iu/ipTQR5Xy99zdxevT5qVEOpvm7mBzVuFJu2UWIQiM9rcWUYqcncEh8jOzqiYw46qKoZv9LDV6HwGzEgb7Oqa2s5ZvLlJHcjL9/AoIWRWJpZoqViHXd3TBbq2ECfKulWvh8XyZ//1YoF6aesXbVNV6pd6cQRLTfYra6fhTRrUMZye7gsVN9dg6gFfBC1gSH7RR6nKc2jIkjIaP6gHaFuGSpvWJOEUGSyfUjvLo4WbSYixQzDkcFLmv4/zHt89PHBLJDrLDGav7FLIaK7LDsutsv8c+NWnRthO866gQLoDAQYpAZ9jjpFZ4pZO0eElBTYhAfzeLd8UKr5aiNR6HKdyyEN+xCkdaJEGM+0ZOPSroNnD/gI6fIwfURNxlfMsD0N2ruoXvRgk5EwEBsz7fCsoCTffYgkfIGSwhDhw/pHLrW50V3TvGR5O7yraLW1AAWw6W+WgKoFk6jl3x5WiOs0AKelhwG3MXBKZ8nu7HXTo1P03l+hfKpFWX0w/IvezDbl74DYc3Xeko/OU5YX0XEnW141i1aQY/qONMZ+IlNCf2E6G2pjUHPkDxIIIKkWrrctbCA5e3mFZjP+xTfGIiuSz7qwAaViXovDlWyIwJHcD9Pq/T5EP6d/k1muaIJ3Mq/ixOVSwxS2ALWRXmtrG0O+eubOMZinBwljEpRO3QqzJZENREXdDHsCI6NqWqk9yPyuZB3Iay8gXlryXVJHjpa34zekQwjfdt4RfBoXmTmGq6cJxp7/U959/mg2y9bqS60m3vekA8ERJzwg+hv680uFlk31XleDdBY5w5ZvllTo3QTLiqlms6tX7vFUkro8tREpM/ggwU/ShAIizwF0s09o6/G42+9z8GLKt+hF7PvRg2X+tCCReVoycG8Ztr4RDIPMGll1qZxGM6qgEt06DaHcfNlPbdjvMC/XeohTZ46R9hEAt0kRvq143KIM0CVhFtgIhY43L4/LVO2UPmuzF5aDzlVZjE6BHq6ITdiK8I2nV2ebOS6kIkmbqchvGw+H2tUXvbh5QnrePzGM87lA+dh2u70FQrx4KuFNF8fGFdnnyE4u97oenaeScMJqY4SfgSFbNgAVGxt9gWbX/iz7V/mCIQwm1su/ftEze4cjQt/e5HJvioDqclN0oWMYU/u9DCMFzhzu63YlzFbvq7Q3eHK30/blBS4UdDe8g1zIa87eQ2FCn16dTsxNA1uJjd0XQ8lPPLAnSe1xf+XWRZr1oHoBLDAMWOG0BaY3avnEMrN0Se7rrMFprHRdGAXKXrQvFY9bv7n4gapkXEA+5PIwvu+JmN+yJ1hC+86rPLX/0dUmRjEMBUg2RFaqOB9MSODUE5j0pTrsv1+ae0J1Oh3xcHmYUX0jhZcnJ6+eytL0VDtgCBeoB/9kNrohUSZiq4mWOU+DTg+Vw982qryXhnAbVM9IKjVdN6wjx4q1ZRdVLjQrDiJee1eIukIcEtsUqnQNxWYMK1iAiLTUNLJWqxSP6sQ0SMXtPeJ04KcIyy/tYs4gIIAQ8oWzXCMaLJIBfIYDxjv+lBQ67vzhXSO4aYyWgMT+1jARNC/eR7whzaL9Zgc5Oc7Wp41Lz10789YP5rHvWyIxlvirP8Sb7t1PP5t9oid62CDakyF7dFw+TBrkON4zbYytg9L3FgfUTW9HRLJC2i5Z+I65Z6fQs1SmCJfn1CVPau6o3T/1CnWYsGw1aVfudBZkhQgKqA3578CWdOiM46xzfMfH3ENKh5hq+7izT/sRpbl5KPiWpvCPLMafmiCfKc+Re2A+NLUy7Ea9OW+sQUzXWJOOT5H8OvFIJfqmjxXKP2J89eQ5VFEzxGUn9a82SdzevEhcDnl8ggObQM49MX4aI3rxNhKkJwmSqRFB+EAzyAYXV8VspEcOGMHzEsq9vs61iyhXe2OPIwc1JaT0nswjUjF6pvwgWxBcZZ1Wt8gbbIWuBre2dqh+7OWV9gLMzwUN4vAUiUwlnhDIcDfgQPXLDhrIuWP1mys8kjRQsIdBeZPwyRdYMN2VESVe+glrBr4USEDMyxx4bkXNZn9a7V6lhPBsXeXmP6yQJlWwv3Zl89Nht9mK/X71+d5kPYGAUzRp/WjbJOg25WRqjz2tCgFhyAaQ5OzrBsEQEOs5hixDhcTHosw+PzqJPk9K1KMg5D85EMf9i5lxj/3q6fOqO3M9cvitnBEAImd1RkcT65LzgcUBkPtqLMn50ti0SJ9QH7BApWqpKt9BJYaXcL821Lb7n5wQsPnah4oemyNKjsdc5s7TwqyV3MKNppuvgeigLaY/VdfsUd1Zw56Ygtk5k2scIgQL5yiv9qDJDjEc+Myxlx3lx6ppl5DsjtsFrYOBNrjk4WcRrVXg0XLJbJTZ8XBIDSeKVwtFIFZEU0398h8GpNVEJD44CHA6GW5vdrIwjjA6M3HMxvxxa0b/B4Qni6i7wRguLDezuxayECQ+ufEjFih8diiXrF6BtrTqoI1G9ten/KsDQWTSXTTXGfV/2XYw1kVoNS+J2srRvAAJbkdfmnu80PGV3Ph2GHuEKW2wJvEk53GsNWp154QZeWZJaGC3173hQdbijRIOgARvsWLtWC+Cfgp92k5K371Ln6bZA5RqXBwPcjV3VZal4LU0hrJmZ3VG2JZT9S+r2K5gdXRiTmsnHg/APxWwMPFe7V2QHFM7Bb0YBfHxEQxcslE4SdU82MoDmt4aLQ80sLcYPzPuZSi8yfhjuLi/Egw3EN2EXXcFcheV80Qf4L14yeRD+B5jDFuYbHB5JphTuU5TmYfODv9Zd6ZaE7ViM57clYLsCdvB2OK+epG5hlW4iQf7gZEmVfAxqu+/VnDWxjPQ8CqAVEsYRC+zMWZweJW5cN62x76A4oMho/B20OOgEWujRRS/3I4ISSaxBd+OyRiyIASL0no6XH6hCKE3HGibZZZBhiiTYUsBxR3mGSKlAQgvhd54Bs/3ukEJa42xLadF02iNMODFfx6e3nYNP4e701IOfqa8h7x/wSKr0qtOqJSKwQMUjEihm68VEkh9qzPj4Z+EhS9C8P1KTxFu1Kin7xadznjQpfikQ2RrBTYNk9QAZLP9xc7u8nmTWxnlv+RcF+/Rg2bjcziLRqAgpkq9bMVuZdXwpgBObvjMIqXYh4H7P5Dt4mVj+4wqDw0UO/zxOgGgthLbybXb3NdIAMryYA8iS4ZVGeTOR2fCvLrfaTVB46SQNtj8Bgn4TxqsfbKlHth6BaIrvhIqGpZ2jixaqhr4IFtmBdEhi6B4VunxF+TTPdTH436PVDfla2Y2th8id0nN9ZJXDa7fJ9cnvcY9KGDg6WKxXl/VSk83vJEdD+8z+VJpT//9f9ArrHBSnlwVhg/zMnEinYOxzcLMRcc3kCkbdsxSdaXbD6ClWLJfhGgiyfAP+EV/sT+8zyfwJwJSYGBz3PLpOQuoDSQ9daQcZ5k1hC4jrUEAZndiYOi2Ja5rcNVjwQh8ow1oGM/DHdloVau8sDZUQiDne28UwgD2t7BpDZrGenfSUXtiqPzVb9WH9mhDKWTd4ckz8utrBdz2CRFlt0sHO72V5XCkTudJVsSLARx339IEqYew5FfGu9eIsg/HbHswqsF9bhozSXN1WcEb18kMrQls19HDp+F9Sr6CFcPYcXP3cf+KoAUverAd8K49xLiynuSPjWKQlBhLGyDALSDMBSolb6OTPuyGu4kET7ousf5D+pBwtif5awecLgrx4WPBE/3WX7brR7UMzdeLrcumK3Sh8UYs/3s+/xa+rcEkK9JZSozyC2pW1kIi1Js5cmbHMdEBajw44OS2RK6BUUxUtPfA4ypfwK7ja5ZncjJfyz1mOpdo4P9jwCLub99fMijgPO6RRszraQVS9b59O/60uliQCbP9N+IP0Oy81KhqKimF2B+nNp4MFXb+Evp4G1c4Ie0xuMjlUxKInjKhnuYn82V7r2gmJHOW7Uk8ANV1Y07TUHHKeX+e8wXFiQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" alt="Banco Central de Reserva del Perú"></a>
     </div>
-    <div class="login-stats">
-      <div><b class="mono">15 nov</b><span>cierre de inscripciones</span></div>
-    </div>
+    <input type="checkbox" id="ce-nav-toggle" class="ce-nav-toggle">
+    <label for="ce-nav-toggle" class="ce-nav-btn" aria-label="Abrir menú"><span></span></label>
+    <ul class="ce-nav">
+      <li><a href="#temas">Temas</a></li>
+      <li><a href="#premios">Premios</a></li>
+      <li><a href="#participar">Participación</a></li>
+      <li><a href="#cronograma">Cronograma</a></li>
+      <li><a href="https://www.youtube.com/playlist?list=PLSf-Yg0l9VEJfnIuZzsTkvgwK3DP1X_dj" target="_blank" rel="noopener">Ganadores anteriores</a></li>
+    </ul>
   </div>
-  <div class="login-panel">
-    <div class="login-card">
-      <h2>Ingresa al portal</h2>
-      <p>Usa tu cuenta para registrar fichas y subir el video de tu equipo.</p>
-      <button class="google-btn" id="btnGoogleLogin" type="button">
-        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-          <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-          <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-          <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
-          <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-        </svg>
-        <span id="googleBtnLabel">Continuar con Google</span>
-      </button>
-      <div class="login-note" style="margin-top:22px">
-        <svg class="icon" width="16" height="16"><use href="#i-info"/></svg>
-        <div>Recuerda que el director de la institución es el único que puede registrar a los equipos participantes.</div>
-      </div>
-      <div class="login-foot">Al continuar aceptas las bases del concurso y la política de tratamiento de datos del BCRP.<br>¿Problemas para ingresar? Escribe a <a href="#" onclick="return false">concurso.escolar@bcrp.gob.pe</a> o por WhatsApp al <a href="#" onclick="return false">972 906 965</a></div>
+</header>
+<main class="ce-content">
+<!-- ===== Contenido editable ===== -->
+<section class="bcrp-gradient text-white d-flex align-items-center hero-section">
+  <div class="container text-center py-5">
+    <span class="d-inline-block py-1 px-3 rounded-pill bg-white-10 border border-white-20 mb-4 text-uppercase small fw-bold">Inscripciones abiertas</span>
+    <h1 class="display-2 fw-black mb-4"><span class="text-gradient-hero">Activa tu creatividad</span></h1>
+    <p class="lead text-blue-100 mx-auto mb-5" style="max-width:700px">Concurso Escolar de Videos BCRP 2026. Representa a tu colegio: tienes 3 minutos para demostrar tus conocimientos.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a href="portal.html" class="btn btn-danger btn-lg rounded-4 px-5 py-3 fw-bold shadow-lg">¡INSCRÍBETE!</a>
+      <a href="#" class="btn btn-outline-light btn-lg rounded-4 px-4 py-3 fw-bold">BASES (PDF)</a>
     </div>
   </div>
 </section>
 
-<!-- ================= APP SHELL ================= -->
-<div class="overlay" id="overlay"></div>
-<div class="shell" id="appShell" hidden>
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <span class="mark">BC</span>
-      <div>BCRP <small>Portal de participantes</small></div>
-      <button class="sidebar-close" id="sidebarClose" aria-label="Cerrar menú"><svg class="icon" width="18" height="18"><use href="#i-x"/></svg></button>
+<div class="container" style="margin-top:-3rem;position:relative">
+  <div class="row g-4">
+    <div class="col-md-6"><div class="glass p-4 rounded-4 shadow"><p class="text-secondary fw-bold text-uppercase small mb-0 ls-wide">Participantes</p><h5 class="fw-bold text-dark mb-0">Estudiantes de 4° y 5° de secundaria</h5></div></div>
+    <div class="col-md-6"><div class="glass p-4 rounded-4 shadow"><p class="text-secondary fw-bold text-uppercase small mb-0 ls-wide">Fecha límite</p><h5 class="fw-bold text-dark mb-0">13 de agosto de 2026</h5></div></div>
+  </div>
+</div>
+
+<section id="temas" class="py-5 my-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-black text-dark mb-3">Temas</h2>
+      <div class="separator bg-primary mx-auto rounded-pill"></div>
+      <p class="text-secondary mt-4 lead mx-auto" style="max-width:600px">Tu video debe abordar con claridad y dinamismo alguno de los siguientes temas:</p>
     </div>
-    <nav class="nav" id="nav">
-      <a href="#inicio" data-view-link="inicio" class="active"><svg class="icon" width="17" height="17"><use href="#i-grid"/></svg> Inicio</a>
-      <a href="#fichas" data-view-link="fichas"><svg class="icon" width="17" height="17"><use href="#i-users"/></svg> Mis fichas</a>
-      <a href="#wizard" data-view-link="wizard"><svg class="icon" width="17" height="17"><use href="#i-file-text"/></svg> Registrar ficha</a>
-      <a href="#upload" data-view-link="upload"><svg class="icon" width="17" height="17"><use href="#i-upload"/></svg> Subir video</a>
-      <button class="nav-cta" id="navCta" type="button"><svg class="icon" width="15" height="15"><use href="#i-plus"/></svg> Registrar nueva ficha</button>
-    </nav>
-    <div class="sidebar-foot">Concurso Escolar de Videos BCRP · 2026<br>Inscripciones abiertas hasta el 15 de noviembre.</div>
-  </aside>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm p-4 rounded-5 card-hover">
+          <div class="card-body text-center">
+            <div class="display-4 mb-3">📈</div>
+            <h3 class="h4 fw-bold text-dark mb-3">¿Cómo controla el BCRP la inflación?</h3>
+            <p class="text-secondary">Entendiendo el esquema de metas de inflación.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm p-4 rounded-5 card-hover">
+          <div class="card-body text-center">
+            <div class="display-4 mb-3">📱</div>
+            <h3 class="h4 fw-bold text-dark mb-3">Pagos digitales en mi localidad</h3>
+            <p class="text-secondary">¿Cómo están cambiando la forma de pagar y ahorrar?</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm p-4 rounded-5 card-hover">
+          <div class="card-body text-center">
+            <div class="display-4 mb-3">🏦</div>
+            <h3 class="h4 fw-bold text-dark mb-3">¿Para qué sirven las reservas internacionales netas?</h3>
+            <p class="text-secondary">¿Cómo contribuyen a la estabilidad económica y financiera del país?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <div class="main">
-    <header class="topbar">
-      <button class="burger" id="burger" aria-label="Abrir menú"><svg class="icon" width="18" height="18"><use href="#i-menu"/></svg></button>
+<section id="premios" class="py-5 bg-light">
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-black text-dark mb-3">Premios</h2>
+      <p class="text-secondary lead">Valoramos tu talento y el compromiso de tu institución.</p>
+    </div>
+    <div class="row align-items-center g-4">
+      <div class="col-lg-4">
+        <div class="bg-white p-5 rounded-5 border text-center h-100">
+          <div class="display-4 mb-3">🥈</div>
+          <span class="d-block text-secondary fw-bold text-uppercase small ls-wide mb-3">Segundo lugar</span>
+          <h3 class="display-6 fw-black text-dark mb-2">S/ 2 000</h3>
+          <p class="text-secondary small fw-bold mb-4">Para cada integrante y docente</p>
+          <div class="pt-4 border-top small fw-bold text-uppercase text-dark">Laptop + Proyector<br>para el colegio</div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white p-5 rounded-5 shadow-lg prize-first text-center h-100">
+          <div class="display-4 mb-3">🥇</div>
+          <span class="d-block text-secondary fw-bold text-uppercase small ls-wide mb-3">Primer lugar</span>
+          <h3 class="display-6 fw-black text-primary mb-2">S/ 3 000</h3>
+          <p class="text-secondary small fw-bold mb-4">Para cada integrante y docente</p>
+          <div class="pt-4 border-top small fw-bold text-uppercase text-dark">Laptop + Proyector<br>para el colegio</div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white p-5 rounded-5 border text-center h-100">
+          <div class="display-4 mb-3">🥉</div>
+          <span class="d-block text-secondary fw-bold text-uppercase small ls-wide mb-3">Tercer lugar</span>
+          <h3 class="display-6 fw-black text-dark mb-2">S/ 1 500</h3>
+          <p class="text-secondary small fw-bold mb-4">Para cada integrante y docente</p>
+          <div class="pt-4 border-top small fw-bold text-uppercase text-dark">Laptop + Proyector<br>para el colegio</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="participar" class="py-5 my-5">
+  <div class="container">
+    <div class="row align-items-center g-4 g-lg-5">
+      <div class="col-lg-6">
+        <h2 class="display-5 fw-black text-dark mb-5">Guía de participación</h2>
+        <div class="d-flex gap-4 mb-4">
+          <span class="step-num flex-shrink-0 d-flex align-items-center justify-content-center bg-primary text-white rounded-3 fs-4 fw-bold">1</span>
+          <div><h4 class="fw-bold text-dark text-uppercase h5">Forma tu equipo</h4><p class="text-secondary">Equipos de 3 alumnos (4° o 5° grado de secundaria) y un profesor asesor. La inscripción es realizada por el director.</p></div>
+        </div>
+        <div class="d-flex gap-4 mb-4">
+          <span class="step-num flex-shrink-0 d-flex align-items-center justify-content-center bg-primary text-white rounded-3 fs-4 fw-bold">2</span>
+          <div><h4 class="fw-bold text-dark text-uppercase h5">Regístrate</h4><p class="text-secondary">El director registra a los equipos en el portal del concurso.</p></div>
+        </div>
+        <div class="d-flex gap-4 mb-4">
+          <span class="step-num flex-shrink-0 d-flex align-items-center justify-content-center bg-primary text-white rounded-3 fs-4 fw-bold">3</span>
+          <div><h4 class="fw-bold text-dark text-uppercase h5">Graba tu video</h4><p class="text-secondary">Video dinámico de máximo 3 minutos. Los alumnos son los protagonistas.</p></div>
+        </div>
+        <div class="d-flex gap-4 mb-4">
+          <span class="step-num flex-shrink-0 d-flex align-items-center justify-content-center bg-primary text-white rounded-3 fs-4 fw-bold">4</span>
+          <div><h4 class="fw-bold text-dark text-uppercase h5">Sube tu material</h4><p class="text-secondary">Carga tu video (máximo 80 MB) a través del portal oficial.</p></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="bg-info-subtle rounded-5 p-5 shadow-lg">
+          <h4 class="fw-black text-primary h3 mb-4">A tener en cuenta</h4>
+          <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
+            <li class="bg-white p-3 rounded-4 shadow-sm fw-bold text-secondary text-uppercase small">Formato: MP4 (máx. 3 minutos)</li>
+            <li class="bg-white p-3 rounded-4 shadow-sm fw-bold text-secondary text-uppercase small">Peso máximo: 80 MB</li>
+            <li class="bg-white p-3 rounded-4 shadow-sm fw-bold text-secondary text-uppercase small">Citar fuentes al final</li>
+            <li class="bg-white p-3 rounded-4 shadow-sm fw-bold text-danger text-uppercase small">No permitido: mencionar colegio, marcas de agua, propaganda explícita.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cronograma" class="py-5 bcrp-gradient text-white">
+  <div class="container">
+    <h2 class="display-5 fw-black text-center mb-5">Cronograma</h2>
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="bg-white-10 p-4 rounded-5 border border-white-20 h-100">
+          <span class="d-block fw-black text-uppercase small mb-3">Registro y envío hasta el</span>
+          <h4 class="h3 fw-bold mb-0">13 de agosto de 2026</h4>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="bg-white-10 p-4 rounded-5 border border-white-20 h-100">
+          <span class="d-block fw-black text-uppercase small mb-3">Semifinalistas</span>
+          <h4 class="h3 fw-bold mb-0">23 de setiembre de 2026</h4>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="bg-white-10 p-4 rounded-5 border border-white-20 h-100">
+          <span class="d-block fw-black text-uppercase small mb-3">Finalistas</span>
+          <h4 class="h3 fw-bold mb-0">22 de octubre de 2026</h4>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="bg-white-10 p-4 rounded-5 border border-white-20 h-100">
+          <span class="d-block fw-black text-uppercase small mb-3">Premiación</span>
+          <h4 class="h3 fw-bold mb-0">19 de noviembre de 2026</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-black text-dark mb-3">Preguntas frecuentes</h2>
+      <div class="separator bg-primary mx-auto rounded-pill"></div>
+    </div>
+    <div class="ce-faq mx-auto" style="max-width:760px">
+      <details><summary>¿Quiénes pueden participar?</summary><p>Estudiantes de cuarto y quinto de secundaria y docentes de instituciones educativas públicas y privadas de todo el país.</p></details>
+      <details><summary>¿Cuántos integrantes tiene cada equipo?</summary><p>Los equipos están conformados por 1 docente y 3 estudiantes de la misma institución educativa.</p></details>
+      <details><summary>¿Cuántos equipos pueden participar por colegio?</summary><p>No hay límite de equipos participantes por institución educativa.</p></details>
+    </div>
+  </div>
+</section>
+<!-- ===== Fin del contenido editable ===== -->
+</main>
+<footer class="ce-footer">
+  <div class="ce-footer__inner">
+    <div class="ce-footer__cols">
       <div>
-        <div class="crumb">Portal de participantes / <b id="crumbCurrent" style="color:var(--text-muted);font-weight:600">Inicio</b></div>
-        <div class="topbar-title" id="topbarTitle">Inicio</div>
+        <img class="ce-footer__logo" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%2248%22%20viewBox%3D%220%200%20200%2048%22%3E%3Crect%20x%3D%220%22%20y%3D%224%22%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%228%22%20fill%3D%22%230A3D7A%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2230%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2214%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EBC%3C%2Ftext%3E%3Ctext%20x%3D%2250%22%20y%3D%2222%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%230A3D7A%22%3ECONCURSO%20ESCOLAR%3C%2Ftext%3E%3Ctext%20x%3D%2250%22%20y%3D%2239%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23C8102E%22%3EBCRP%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Concurso Escolar BCRP 2026">
+        <p class="ce-footer__desc">Construyendo cultura económica y financiera desde las aulas.</p>
+        <div class="ce-social">
+          <a href="https://www.facebook.com/bcrpoficial/" target="_blank" rel="noopener" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.instagram.com/bcrpoficial/" target="_blank" rel="noopener" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="https://www.youtube.com/user/bcrpoficial" target="_blank" rel="noopener" aria-label="YouTube"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+          <a href="https://x.com/bcrpoficial" target="_blank" rel="noopener" aria-label="X"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg></a>
+        </div>
       </div>
-      <div class="topbar-spacer"></div>
-      <div class="contest-pill"><span class="dot"></span>Inscripciones abiertas <span>· cierra 15 nov 2026</span></div>
-      <div class="user-chip">
-        <span class="avatar" id="userAvatar">CS</span>
-        <div><div class="name" id="userName">Carmen Salazar</div><div class="role" id="userEmail">carmen.salazar@ie1154.edu.pe</div></div>
+      <div>
+        <h5 class="ce-footer__title">Contáctanos</h5>
+        <div class="ce-contact">
+          <a class="ce-contact__item" href="mailto:concurso.escolar@bcrp.gob.pe"><span class="ce-contact__icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Email: concurso.escolar@bcrp.gob.pe</span></a>
+          <a class="ce-contact__item" href="https://wa.me/51972906965" target="_blank" rel="noopener"><span class="ce-contact__icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span>WhatsApp: +51 972 906 965</span></a>
+          <div class="ce-contact__item"><span class="ce-contact__icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span>Teléfono: +51 (1) 613-2000<br>Anexos 25356 y 22649</span></div>
+        </div>
       </div>
-      <button class="logout-btn" id="btnLogout"><svg class="icon" width="14" height="14"><use href="#i-log-out"/></svg> Salir</button>
-    </header>
-
-    <main class="content">
-
-      <!-- ===== INICIO ===== -->
-      <section class="view active" id="view-inicio">
-        <div class="deadline-banner">
-          <div class="icon-wrap"><svg class="icon" width="19" height="19"><use href="#i-clock"/></svg></div>
-          <div><b>Quedan 55 días para inscribirse</b><span>El concurso cierra el 15 de noviembre de 2026 a las 23:59 (hora Perú).</span></div>
-          <div class="topbar-spacer"></div>
-          <button class="btn btn-primary btn-sm" data-view-link="wizard" id="btnBannerNueva"><svg class="icon" width="13" height="13"><use href="#i-plus"/></svg> Registrar ficha</button>
-        </div>
-
-        <div class="page-head"><h1>Hola, Carmen</h1><p>Este es el resumen de la participación de tu institución en el concurso.</p></div>
-
-        <div class="kpi-row">
-          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-users"/></svg> Fichas registradas</div><div class="kpi-value" id="kpiFichas">1</div></div>
-          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-upload"/></svg> Videos pendientes</div><div class="kpi-value" id="kpiPendientes">1</div></div>
-          <div class="kpi-tile"><div class="kpi-label"><svg class="icon" width="13" height="13"><use href="#i-check-circle"/></svg> Videos subidos</div><div class="kpi-value" id="kpiSubidos">0</div></div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-users"/></svg></span><h2>Tus fichas recientes</h2><span class="hint">Ver todas en “Mis fichas”</span></div>
-          <div class="card-body" id="inicioFichasResumen"></div>
-        </div>
-
-        <div class="grid cols-2">
-          <div class="card" style="margin-bottom:0">
-            <div class="card-body" style="display:flex;gap:14px;align-items:center">
-              <div class="icon-badge" style="width:40px;height:40px;border-radius:11px"><svg class="icon" width="18" height="18"><use href="#i-file-text"/></svg></div>
-              <div style="flex:1"><b style="font-size:13.5px">Registra una nueva ficha</b><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Suma otro equipo de tu colegio al concurso.</div></div>
-              <button class="btn btn-ghost btn-sm" data-view-link="wizard">Ir</button>
-            </div>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div class="card-body" style="display:flex;gap:14px;align-items:center">
-              <div class="icon-badge" style="width:40px;height:40px;border-radius:11px"><svg class="icon" width="18" height="18"><use href="#i-upload"/></svg></div>
-              <div style="flex:1"><b style="font-size:13.5px">Sube el video de tu equipo</b><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Formatos MP4, MOV o AVI.</div></div>
-              <button class="btn btn-ghost btn-sm" data-view-link="upload">Ir</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== MIS FICHAS ===== -->
-      <section class="view" id="view-fichas">
-        <div class="page-head">
-          <div><h1>Mis fichas</h1><p>Fichas registradas por tu institución en el Concurso Escolar de Videos BCRP 2026.</p></div>
-          <button class="btn btn-primary" id="btnNuevaDesdeFichas"><svg class="icon" width="14" height="14"><use href="#i-plus"/></svg> Registrar nueva ficha</button>
-        </div>
-        <div class="ficha-grid" id="fichaGrid"></div>
-      </section>
-
-      <!-- ===== WIZARD: ELECCION ===== -->
-      <section class="view" id="view-wizard-choice">
-        <div class="page-head"><h1>Registrar nueva ficha</h1><p>Ya registraste datos de tu institución. Puedes reutilizarlos para inscribir a otro equipo con distinto profesor asesor, estudiantes y tema.</p></div>
-        <div class="choice-grid">
-          <button class="choice-card" id="choiceReuse" type="button">
-            <div class="icon-wrap"><svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg></div>
-            <b>Reutilizar datos del colegio</b>
-            <span>Reutiliza institución y director ya registrados. Solo completarás tema, estudiantes y profesor asesor.</span>
-          </button>
-          <button class="choice-card" id="choiceNew" type="button">
-            <div class="icon-wrap"><svg class="icon" width="16" height="16"><use href="#i-building"/></svg></div>
-            <b>Registrar institución nueva</b>
-            <span>Completa el formulario desde cero, incluyendo los datos de la institución educativa.</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- ===== WIZARD ===== -->
-      <section class="view" id="view-wizard">
-        <div class="page-head"><h1>Registrar ficha</h1><p>Completa los datos en siete pasos. Puedes avanzar y retroceder sin perder lo escrito; los campos con <span style="color:var(--red)">*</span> son obligatorios.</p></div>
-
-        <div class="reuse-note" id="reuseNote" hidden>
-          <svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg>
-          <div><b>Usando los datos de tu colegio.</b> Institución y director se copiaron de una ficha anterior — puedes editarlos en los pasos 1 y 2 si algo cambió.</div>
-        </div>
-
-        <div class="wizard">
-          <nav class="steps" id="steps">
-            <button class="step-item current" data-step="0" type="button"><span class="step-num">1</span><span class="step-label">Institución educativa</span></button>
-            <button class="step-item" data-step="1" type="button"><span class="step-num">2</span><span class="step-label">Director</span></button>
-            <button class="step-item" data-step="2" type="button"><span class="step-num">3</span><span class="step-label">Del trabajo</span></button>
-            <button class="step-item" data-step="3" type="button"><span class="step-num">4</span><span class="step-label">Estudiantes</span></button>
-            <button class="step-item" data-step="4" type="button"><span class="step-num">5</span><span class="step-label">Profesor asesor</span></button>
-            <button class="step-item" data-step="5" type="button"><span class="step-num">6</span><span class="step-label">Cómo se enteraron</span></button>
-            <button class="step-item" data-step="6" type="button"><span class="step-num">7</span><span class="step-label">Revisar y enviar</span></button>
-          </nav>
-
-          <form class="card" id="ficha-form" novalidate>
-            <div class="card-body">
-
-              <div class="step-panel active" data-panel="0">
-                <div class="grid cols-2">
-                  <div class="field" style="grid-column:1/-1"><label>Nombre de la institución educativa <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-building"/></svg><input required id="ie-nombre" type="text" placeholder="Ej. I.E. 1154 Marcos Durán Martel"></div>
-                    <span class="field-error">Escribe el nombre de la institución.</span>
-                  </div>
-                  <div class="field" style="grid-column:1/-1"><label>Dirección <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-direccion" type="text" placeholder="Av., calle o jirón, número"></div>
-                    <span class="field-error">Escribe la dirección de la institución.</span>
-                  </div>
-                  <div class="field"><label>Región <span class="req">*</span></label>
-                    <div class="ctrl select"><select required id="ie-region"><option value="">Selecciona región</option></select></div>
-                    <span class="field-error">Selecciona la región.</span>
-                  </div>
-                  <div class="field"><label>Provincia <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-provincia" type="text" placeholder="Ej. San Martín"></div>
-                    <span class="field-error">Escribe la provincia.</span>
-                  </div>
-                  <div class="field"><label>Distrito <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-map-pin"/></svg><input required id="ie-distrito" type="text" placeholder="Ej. Tarapoto"></div>
-                    <span class="field-error">Escribe el distrito.</span>
-                  </div>
-                  <div class="field"><label>Teléfono <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="ie-telefono" type="tel" placeholder="01 234 5678"></div>
-                    <span class="field-error">Ingresa un teléfono de contacto.</span>
-                  </div>
-                  <div class="field" style="grid-column:1/-1"><label>Correo institucional <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="ie-correo" type="email" placeholder="contacto@institucion.edu.pe"></div>
-                    <span class="field-error">Ingresa un correo válido.</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="step-panel" data-panel="1">
-                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos de la persona que dirige la institución educativa.</p>
-                <div class="grid cols-3">
-                  <div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="d-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="d-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>
-                  <div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="d-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="d-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field" style="grid-column:1/-1"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="d-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>
-                </div>
-              </div>
-
-              <div class="step-panel" data-panel="2">
-                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos del video que presenta el equipo.</p>
-                <div class="grid cols-2">
-                  <div class="field" style="grid-column:1/-1"><label>Tema <span class="req">*</span></label>
-                    <div class="ctrl select"><select required id="w-tema">
-                      <option value="">Selecciona un tema…</option>
-                      <option>Metas de inflación</option><option>Pagos digitales</option><option>Reservas internacionales</option><option>Dolarización</option><option>Billetes y monedas</option>
-                    </select></div>
-                    <span class="field-error">Selecciona el tema del video.</span>
-                  </div>
-                  <div class="field" style="grid-column:1/-1"><label>Título <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-video"/></svg><input required id="w-titulo" type="text" placeholder="Título tal como aparece en el video" maxlength="120"></div>
-                    <span class="field-error">Escribe el título del video.</span>
-                  </div>
-                  <div class="field" style="grid-column:1/-1"><label>Seudónimo del equipo <span class="req">*</span></label>
-                    <div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-tag"/></svg><input required id="w-seudonimo" type="text" placeholder="Nombre con el que se identificará el equipo" maxlength="40"></div>
-                    <span class="field-error">Escribe el seudónimo del equipo.</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="step-panel" data-panel="3">
-                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">El equipo participa con 3 estudiantes.</p>
-                <div id="participantesList"></div>
-              </div>
-
-              <div class="step-panel" data-panel="4">
-                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Datos del profesor que asesora al equipo participante.</p>
-                <div class="reuse-note" id="profReuseNote" style="align-items:flex-start" hidden>
-                  <svg class="icon" width="16" height="16"><use href="#i-repeat"/></svg>
-                  <div style="flex:1">
-                    <b>¿Es el mismo profesor asesor de otra ficha?</b> Es opcional: si quieres, reutiliza sus datos en vez de escribirlos de nuevo.
-                    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
-                      <div class="ctrl select" style="min-width:240px;flex:1"><select id="profReuseSelect"></select></div>
-                      <button type="button" class="btn btn-ghost btn-sm" id="btnUseProfReuse">Usar estos datos</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="grid cols-3">
-                  <div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="p-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="p-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>
-                  <div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="p-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="p-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field" style="grid-column:span 2"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="p-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>
-                  <div class="field"><label>Especialidad <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-award"/></svg><input required id="p-especialidad" type="text" placeholder="Ej. Educación secundaria - Comunicación"></div><span class="field-error">Campo obligatorio.</span></div>
-                  <div class="field" style="grid-column:1/-1"><label>Cursos que dicta <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-file-text"/></svg><input required id="p-cursos" type="text" placeholder="Ej. Comunicación, Arte y cultura"></div><span class="field-error">Campo obligatorio.</span></div>
-                </div>
-              </div>
-
-              <div class="step-panel" data-panel="5">
-                <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-muted)">Marca todos los medios por los que se enteraron del concurso; el detalle es opcional.</p>
-                <div id="enteraronList"></div>
-              </div>
-
-              <div class="step-panel" data-panel="6">
-                <div id="reviewArea"></div>
-              </div>
-
-            </div>
-            <div class="card-body" style="padding-top:0">
-              <div class="wizard-nav">
-                <button type="button" class="btn btn-ghost" id="btnPrev" disabled><svg class="icon" width="14" height="14"><use href="#i-arrow-left"/></svg> Anterior</button>
-                <span class="req-legend"><span class="req">*</span> obligatorio</span>
-                <div class="topbar-spacer"></div>
-                <button type="button" class="btn btn-primary" id="btnNext">Siguiente <svg class="icon" width="14" height="14"><use href="#i-arrow-right"/></svg></button>
-                <button type="submit" class="btn btn-primary" id="btnSubmit" hidden><svg class="icon" width="14" height="14"><use href="#i-check"/></svg> Enviar ficha</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <!-- ===== SUCCESS ===== -->
-      <section class="view" id="view-success">
-        <div class="card success-card">
-          <div class="success-icon"><svg class="icon" width="30" height="30"><use href="#i-check-circle"/></svg></div>
-          <h2 style="font-size:19px">¡Ficha registrada con éxito!</h2>
-          <p style="color:var(--text-muted);font-size:13.5px;max-width:46ch;margin:8px auto 0">Guarda el código de tu ficha: lo necesitarás para subir el video y para hacer seguimiento a tu inscripción.</p>
-          <div class="success-code mono" id="successCode">CE-2026-0000-000000</div>
-          <div class="actions-row" style="justify-content:center;margin-top:22px">
-            <button class="btn btn-ghost" id="btnAnother">Registrar otra ficha</button>
-            <button class="btn btn-ghost" id="btnToList">Ver mis fichas</button>
-            <button class="btn btn-primary" id="btnGoUpload"><svg class="icon" width="14" height="14"><use href="#i-upload"/></svg> Subir video ahora</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SUBIR VIDEO ===== -->
-      <section class="view" id="view-upload">
-        <div class="page-head"><h1>Subir video</h1><p>Sube el video correspondiente a una de tus fichas ya registradas.</p></div>
-
-        <div class="card">
-          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-file-text"/></svg></span><h2>Elegir ficha</h2></div>
-          <div class="card-body">
-            <div class="field" style="max-width:440px">
-              <label>Ficha <span class="req">*</span></label>
-              <div class="ctrl select"><select id="up-ficha"></select></div>
-            </div>
-            <div id="up-preview"></div>
-
-            <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);margin:20px 0 10px">Archivo de video</div>
-            <div class="dropzone" id="up-dropzone">
-              <svg class="icon" width="28" height="28"><use href="#i-upload"/></svg>
-              <div class="dz-title" id="up-dz-title">Arrastra el video aquí o haz clic para elegirlo</div>
-              <div class="dz-sub" id="up-file-name">Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB</div>
-              <input type="file" id="up-file" accept="video/*">
-            </div>
-            <div class="upload-progress" id="up-progress" hidden>
-              <div class="bar"><span id="up-progress-bar"></span></div>
-              <div class="lbl"><span id="up-progress-text">Subiendo…</span><span id="up-progress-pct">0%</span></div>
-            </div>
-
-            <div class="actions-row">
-              <button type="button" class="btn btn-primary" id="btnSubirVideo"><svg class="icon" width="14" height="14"><use href="#i-upload"/></svg> Subir video</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><span class="icon-badge"><svg class="icon" width="15" height="15"><use href="#i-clock"/></svg></span><h2>Subidas recientes</h2></div>
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th>Ficha</th><th>Archivo</th><th>Hora</th></tr></thead>
-              <tbody id="uploadLogBody"></tbody>
-            </table>
-          </div>
-          <div class="empty-state" id="uploadLogEmpty">
-            <svg class="icon" width="30" height="30"><use href="#i-inbox"/></svg>
-            <div>Aún no subes archivos en esta sesión.</div>
-          </div>
-        </div>
-      </section>
-
-    </main>
+    </div>
+    <div class="ce-footer__bottom">
+      <p class="ce-footer__copy">© 2026 Banco Central de Reserva del Perú</p>
+      <div class="ce-footer__docs">
+        <a class="ce-footer__link" href="terminos-condiciones-ce2026.pdf" download="terminos-condiciones-ce2026.pdf">Términos y condiciones</a>
+        <a class="ce-footer__btn" href="bases-ce2026.pdf" download="bases-ce2026.pdf"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg><span>Descargar Bases</span></a>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-head"><h2>Ficha registrada</h2><button class="modal-close" id="modalClose" type="button"><svg class="icon" width="16" height="16"><use href="#i-x"/></svg></button></div>
-    <div class="modal-body" id="modalBody"></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"><span id="toastMsg"></span></div>
-
-<script>
-(function(){
-  "use strict";
-
-  function $(sel,root){ return (root||document).querySelector(sel); }
-  function $all(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
-  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
-
-  var REGIONES = ["Amazonas","Áncash","Apurímac","Arequipa","Ayacucho","Cajamarca","Callao","Cusco","Huancavelica","Huánuco","Ica","Junín","La Libertad","Lambayeque","Lima","Loreto","Madre de Dios","Moquegua","Pasco","Piura","Puno","San Martín","Tacna","Tumbes","Ucayali"];
-  var GRADOS = ["1° de secundaria","2° de secundaria","3° de secundaria","4° de secundaria","5° de secundaria"];
-  var ENTERARON_OPCIONES = [
-    {label:"Web", detalle:"¿Cuál sitio?"},
-    {label:"Periódico o revista", detalle:"¿Cuál?"},
-    {label:"Televisión", detalle:"¿Cuál programa?"},
-    {label:"Radio", detalle:"¿Cuál emisora?"},
-    {label:"UGEL", detalle:"¿Cuál Ugel?"},
-    {label:"Otro", detalle:"(Opcional)"},
-    {label:"Teléfono", detalle:"(Opcional)"},
-    {label:"WhatsApp", detalle:"¿Cuál es tu WhatsApp?"},
-    {label:"Colegio", detalle:"Lugar, medio"},
-    {label:"Facebook", detalle:"¿Cuál página?"},
-    {label:"X (Twitter)", detalle:"¿Cuál cuenta?"},
-    {label:"YouTube", detalle:"¿Cuál canal?"},
-    {label:"Instagram", detalle:"¿Cuál canal?"},
-    {label:"TikTok", detalle:"¿Cuál canal?"},
-    {label:"Correo", detalle:"¿Remitente?"}
-  ];
-
-  var USER = { name:"Carmen Salazar", email:"carmen.salazar@ie1154.edu.pe", initials:"CS" };
-
-  var fichas = [{
-    id:1,
-    codigo:"CE-2026-1154-030815-58204",
-    preview:true,
-    colegio:{ nombre:"I.E. 1154 Marcos Durán Martel", direccion:"Jr. Los Robles 482", region:"Lima", provincia:"Lima", distrito:"San Juan de Lurigancho", telefono:"01 456 7890", correo:"contacto@ie1154.edu.pe" },
-    director:{ appat:"Vargas", apmat:"Ochoa", nombres:"Luis Alberto", tipodoc:"DNI", numdoc:"10458732", telefono:"987 112 233", correo:"director@ie1154.edu.pe" },
-    trabajo:{ tema:"Billetes y monedas", titulo:"El valor detrás del billete", seudonimo:"Los Guardianes del Sol" },
-    estudiantes:[
-      {appat:"Quiroz", apmat:"Fernández", nombres:"Ariana Sofía", tipodoc:"DNI", numdoc:"78541236", grado:"4° de secundaria", telefono:"956 214 778", correo:"ariana.qf@example.com"},
-      {appat:"Ramos", apmat:"Delgado", nombres:"Mateo Iker", tipodoc:"DNI", numdoc:"79632145", grado:"4° de secundaria", telefono:"944 331 220", correo:"mateo.rd@example.com"},
-      {appat:"Huamán", apmat:"Torres", nombres:"Valentina", tipodoc:"DNI", numdoc:"80147523", grado:"4° de secundaria", telefono:"923 887 410", correo:"valentina.ht@example.com"}
-    ],
-    profesor:{ appat:"Salazar", apmat:"Ponce", nombres:"Carmen Rosa", tipodoc:"DNI", numdoc:"41236598", telefono:"944 552 118", correo:"carmen.salazar@ie1154.edu.pe", especialidad:"Educación secundaria - Comunicación", cursos:"Comunicación, Arte y cultura" },
-    entero:["Facebook"],
-    videoStatus:"pendiente",
-    createdAt:"12 sep 2026 · 10:32 a. m."
-  }];
-  var nextFichaId = 2;
-  var uploads = [];
-
-  var FORM_SETTINGS = { numEstudiantes: 3 };
-  var participantIds = [1,2,3];
-  var reuseSource = null; // ficha whose colegio/director data is reused
-  var wizardStep = 0;
-  var STEP_COUNT = 7;
-
-  /* ---------------- Login ---------------- */
-  var btnGoogleLogin = $("#btnGoogleLogin");
-  btnGoogleLogin.addEventListener("click", function(){
-    btnGoogleLogin.disabled = true;
-    $("#googleBtnLabel").textContent = "Conectando con Google…";
-    var spin = document.createElement("span");
-    spin.className = "google-spin";
-    btnGoogleLogin.insertBefore(spin, btnGoogleLogin.firstChild);
-    setTimeout(function(){
-      $("#view-login").hidden = true;
-      $("#appShell").hidden = false;
-      $("#userAvatar").textContent = USER.initials;
-      $("#userName").textContent = USER.name;
-      $("#userEmail").textContent = USER.email;
-      switchView("inicio");
-      renderAll();
-    }, 900);
-  });
-
-  $("#btnLogout").addEventListener("click", function(){
-    $("#appShell").hidden = true;
-    $("#view-login").hidden = false;
-    btnGoogleLogin.disabled = false;
-    $("#googleBtnLabel").textContent = "Continuar con Google";
-    var spin = $(".google-spin"); if(spin) spin.remove();
-  });
-
-  /* ---------------- Nav / views ---------------- */
-  var sidebar = $("#sidebar"), overlay = $("#overlay");
-  function openSidebar(){ sidebar.classList.add("open"); overlay.classList.add("show"); }
-  function closeSidebar(){ sidebar.classList.remove("open"); overlay.classList.remove("show"); }
-  $("#burger").addEventListener("click", openSidebar);
-  $("#sidebarClose").addEventListener("click", closeSidebar);
-  overlay.addEventListener("click", closeSidebar);
-
-  var VIEW_TITLES = { inicio:"Inicio", fichas:"Mis fichas", wizard:"Registrar ficha", upload:"Subir video" };
-  function switchView(name){
-    $all(".view").forEach(function(v){ v.classList.remove("active"); });
-    var target = name === "wizard-choice" ? "wizard-choice" : name;
-    var el = $("#view-"+target);
-    if(el) el.classList.add("active");
-    $all(".nav a").forEach(function(a){ a.classList.toggle("active", a.dataset.viewLink === name); });
-    var title = VIEW_TITLES[name] || VIEW_TITLES[name.split("-")[0]] || "Portal";
-    $("#topbarTitle").textContent = title;
-    $("#crumbCurrent").textContent = title;
-    closeSidebar();
-    window.scrollTo(0,0);
-  }
-  $all("[data-view-link]").forEach(function(el){
-    el.addEventListener("click", function(e){
-      e.preventDefault();
-      var name = el.dataset.viewLink;
-      if(name === "wizard"){ startNuevaFicha(); return; }
-      switchView(name);
-    });
-  });
-
-  function startNuevaFicha(){
-    if(fichas.length > 0){
-      switchView("wizard-choice");
-    } else {
-      openWizard(null);
-    }
-  }
-  $("#navCta").addEventListener("click", startNuevaFicha);
-  $("#btnNuevaDesdeFichas").addEventListener("click", startNuevaFicha);
-  $("#choiceNew").addEventListener("click", function(){ openWizard(null); });
-  $("#choiceReuse").addEventListener("click", function(){ openWizard(fichas[fichas.length-1]); });
-
-  /* ---------------- Dashboard ---------------- */
-  function renderInicio(){
-    $("#kpiFichas").textContent = fichas.length;
-    $("#kpiPendientes").textContent = fichas.filter(function(f){ return f.videoStatus!=="subido"; }).length;
-    $("#kpiSubidos").textContent = fichas.filter(function(f){ return f.videoStatus==="subido"; }).length;
-    var wrap = $("#inicioFichasResumen");
-    if(fichas.length===0){
-      wrap.innerHTML = '<div class="empty-state"><svg class="icon" width="30" height="30"><use href="#i-users"/></svg><div>Aún no registras ninguna ficha.</div></div>';
-      return;
-    }
-    wrap.innerHTML = fichas.slice(0,3).map(function(f){
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">' +
-        '<div class="icon-badge" style="width:34px;height:34px;border-radius:9px"><svg class="icon" width="15" height="15"><use href="#i-video"/></svg></div>' +
-        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+esc(f.trabajo.seudonimo)+'</div><div class="mono" style="font-size:11px;color:var(--text-faint)">'+esc(f.codigo)+'</div></div>' +
-        statusBadge(f.videoStatus) +
-      '</div>';
-    }).join("").replace(/border-bottom:1px solid var\(--border\)"(?=[^>]*$)/,'border-bottom:0"');
-  }
-
-  function statusBadge(status){
-    return status==="subido"
-      ? '<span class="badge badge-green"><svg class="icon" width="11" height="11"><use href="#i-check-circle"/></svg> Video subido</span>'
-      : '<span class="badge badge-amber"><svg class="icon" width="11" height="11"><use href="#i-clock"/></svg> Pendiente de subir</span>';
-  }
-
-  /* ---------------- Mis fichas ---------------- */
-  function renderFichaGrid(){
-    var grid = $("#fichaGrid");
-    if(fichas.length===0){
-      grid.innerHTML = '<div class="card"><div class="empty-state"><svg class="icon" width="30" height="30"><use href="#i-users"/></svg><div>Aún no registras ninguna ficha. Usa “Registrar nueva ficha” para empezar.</div></div></div>';
-      return;
-    }
-    grid.innerHTML = fichas.map(function(f){
-      return '<div class="ficha-card">' +
-        '<div class="fc-top"><div><div class="fc-title">'+esc(f.trabajo.seudonimo)+'</div><div class="fc-code mono">'+esc(f.codigo)+'</div></div>' + statusBadge(f.videoStatus) + '</div>' +
-        (f.preview ? '<span class="preview-tag"><svg class="icon" width="10" height="10"><use href="#i-info"/></svg> Datos de ejemplo</span>' : '') +
-        '<div class="fc-meta">' +
-          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-tag"/></svg>'+esc(f.trabajo.tema)+'</div>' +
-          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-award"/></svg>Prof. '+esc(f.profesor.nombres+" "+f.profesor.appat)+'</div>' +
-          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-users"/></svg>'+f.estudiantes.length+' estudiantes</div>' +
-          '<div class="row"><svg class="icon" width="13" height="13"><use href="#i-clock"/></svg>Registrada el '+esc(f.createdAt)+'</div>' +
-        '</div>' +
-        '<div class="fc-actions">' +
-          '<button class="btn btn-ghost btn-sm" data-reuse="'+f.id+'"><svg class="icon" width="12" height="12"><use href="#i-repeat"/></svg> Reutilizar datos</button>' +
-          '<button class="btn btn-primary btn-sm" data-upload-for="'+f.id+'"><svg class="icon" width="12" height="12"><use href="#i-upload"/></svg> Subir video</button>' +
-        '</div>' +
-      '</div>';
-    }).join("");
-    $all("[data-reuse]", grid).forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var f = fichas.find(function(x){ return x.id===parseInt(btn.dataset.reuse,10); });
-        openWizard(f);
-      });
-    });
-    $all("[data-upload-for]", grid).forEach(function(btn){
-      btn.addEventListener("click", function(){
-        switchView("upload");
-        $("#up-ficha").value = btn.dataset.uploadFor;
-        renderUploadPreview();
-      });
-    });
-  }
-
-  /* ---------------- Wizard ---------------- */
-  var panels = $all(".step-panel");
-  var stepItems = $all(".step-item");
-
-  function populateRegiones(){
-    var sel = $("#ie-region");
-    sel.innerHTML = '<option value="">Selecciona región</option>' + REGIONES.map(function(r){ return "<option>"+r+"</option>"; }).join("");
-  }
-
-  function openWizard(reuse){
-    reuseSource = reuse || null;
-    $("#ficha-form").reset();
-    $all(".field").forEach(function(f){ f.classList.remove("invalid"); });
-    populateRegiones();
-    renderParticipantes();
-    renderEnteraron();
-    renderProfReuseOptions();
-    wizardStep = reuse ? 2 : 0;
-    if(reuse){
-      $("#ie-nombre").value = reuse.colegio.nombre;
-      $("#ie-direccion").value = reuse.colegio.direccion;
-      $("#ie-region").value = reuse.colegio.region;
-      $("#ie-provincia").value = reuse.colegio.provincia;
-      $("#ie-distrito").value = reuse.colegio.distrito;
-      $("#ie-telefono").value = reuse.colegio.telefono;
-      $("#ie-correo").value = reuse.colegio.correo;
-      $("#d-appat").value = reuse.director.appat;
-      $("#d-apmat").value = reuse.director.apmat;
-      $("#d-nombres").value = reuse.director.nombres;
-      $("#d-tipodoc").value = reuse.director.tipodoc;
-      $("#d-numdoc").value = reuse.director.numdoc;
-      $("#d-telefono").value = reuse.director.telefono;
-      $("#d-correo").value = reuse.director.correo;
-      $("#reuseNote").hidden = false;
-    } else {
-      $("#reuseNote").hidden = true;
-    }
-    stepItems.forEach(function(it,i){ it.classList.toggle("done", reuse ? i<2 : false); });
-    goStep(wizardStep);
-    switchView("wizard");
-  }
-
-  function fieldsInPanel(i){
-    return $all("input[required], select[required]", panels[i]);
-  }
-  function validatePanel(i){
-    var ok = true;
-    fieldsInPanel(i).forEach(function(inp){
-      var field = inp.closest(".field");
-      var valid = inp.value && inp.value.trim().length>0;
-      if(inp.type==="email" && valid){ valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value); }
-      field.classList.toggle("invalid", !valid);
-      if(!valid) ok = false;
-    });
-    return ok;
-  }
-
-  function goStep(i){
-    wizardStep = Math.max(0, Math.min(STEP_COUNT-1, i));
-    panels.forEach(function(p,idx){ p.classList.toggle("active", idx===wizardStep); });
-    stepItems.forEach(function(it,idx){
-      it.classList.toggle("current", idx===wizardStep);
-      if(idx < wizardStep) it.classList.add("done");
-      if(idx > wizardStep && !(reuseSource && idx<2)) it.classList.remove("done");
-    });
-    $("#btnPrev").disabled = wizardStep===0;
-    var isLast = wizardStep === STEP_COUNT-1;
-    $("#btnNext").hidden = isLast;
-    $("#btnSubmit").hidden = !isLast;
-    if(isLast) buildReview();
-  }
-  stepItems.forEach(function(it){
-    it.addEventListener("click", function(){ goStep(parseInt(it.dataset.step,10)); });
-  });
-  $("#btnPrev").addEventListener("click", function(){ goStep(wizardStep-1); });
-  $("#btnNext").addEventListener("click", function(){
-    if(validatePanel(wizardStep)) goStep(wizardStep+1);
-    else showToast("Completa los campos obligatorios antes de continuar.");
-  });
-
-  function participantCardHTML(id, num){
-    return '<div class="participant-card">' +
-      '<div class="participant-card-head"><svg class="icon" width="15" height="15"><use href="#i-user"/></svg> ESTUDIANTE '+num+'</div>' +
-      '<div class="grid cols-3">' +
-        '<div class="field"><label>Apellido paterno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-appat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
-        '<div class="field"><label>Apellido materno <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-apmat" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
-        '<div class="field"><label>Nombres <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-user"/></svg><input required id="est'+id+'-nombres" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
-        '<div class="field"><label>Tipo de documento <span class="req">*</span></label><div class="ctrl select"><select required id="est'+id+'-tipodoc"><option value="">Seleccione</option><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div><span class="field-error">Selecciona un tipo.</span></div>' +
-        '<div class="field"><label>Número de documento <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-credit-card"/></svg><input required id="est'+id+'-numdoc" type="text"></div><span class="field-error">Campo obligatorio.</span></div>' +
-        '<div class="field"><label>Grado <span class="req">*</span></label><div class="ctrl select"><select required id="est'+id+'-grado"><option value="">Seleccione</option>'+GRADOS.map(function(g){return "<option>"+g+"</option>";}).join("")+'</select></div><span class="field-error">Selecciona el grado.</span></div>' +
-        '<div class="field"><label>Teléfono <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-phone"/></svg><input required id="est'+id+'-telefono" type="tel"></div><span class="field-error">Campo obligatorio.</span></div>' +
-        '<div class="field" style="grid-column:span 2"><label>Correo <span class="req">*</span></label><div class="ctrl has-icon"><svg class="icon" width="14" height="14"><use href="#i-mail"/></svg><input required id="est'+id+'-correo" type="email"></div><span class="field-error">Ingresa un correo válido.</span></div>' +
-      '</div></div>';
-  }
-  function renderParticipantes(){
-    var wrap = $("#participantesList");
-    wrap.innerHTML = participantIds.map(function(id,idx){ return participantCardHTML(id, idx+1); }).join("");
-  }
-  function uniqueProfesores(){
-    var seen = {}, list = [];
-    fichas.forEach(function(f){
-      var p = f.profesor;
-      var key = (p.numdoc || (p.nombres+p.appat+p.apmat)).toLowerCase();
-      if(!p.nombres && !p.appat) return;
-      if(seen[key]) return;
-      seen[key] = true;
-      list.push({ label: [p.nombres,p.appat,p.apmat].filter(Boolean).join(" ") + " · ficha " + f.codigo, data: p });
-    });
-    return list;
-  }
-  function renderProfReuseOptions(){
-    var note = $("#profReuseNote"), sel = $("#profReuseSelect");
-    var options = uniqueProfesores();
-    if(options.length===0){ note.hidden = true; return; }
-    note.hidden = false;
-    sel.innerHTML = options.map(function(o,i){ return '<option value="'+i+'">'+esc(o.label)+'</option>'; }).join("");
-    sel.dataset.options = JSON.stringify(options.map(function(o){ return o.data; }));
-  }
-  $("#btnUseProfReuse").addEventListener("click", function(){
-    var sel = $("#profReuseSelect");
-    var options = JSON.parse(sel.dataset.options || "[]");
-    var p = options[parseInt(sel.value,10)];
-    if(!p) return;
-    $("#p-appat").value = p.appat || "";
-    $("#p-apmat").value = p.apmat || "";
-    $("#p-nombres").value = p.nombres || "";
-    $("#p-tipodoc").value = p.tipodoc || "";
-    $("#p-numdoc").value = p.numdoc || "";
-    $("#p-telefono").value = p.telefono || "";
-    $("#p-correo").value = p.correo || "";
-    $("#p-especialidad").value = p.especialidad || "";
-    $("#p-cursos").value = p.cursos || "";
-    $all(".field", $("[data-panel='4']")).forEach(function(f){ f.classList.remove("invalid"); });
-    showToast("Datos del profesor asesor reutilizados.");
-  });
-
-  function renderEnteraron(){
-    var wrap = $("#enteraronList");
-    wrap.innerHTML = ENTERARON_OPCIONES.map(function(o,i){
-      return '<div class="entero-row"><label class="chk"><input type="checkbox" id="ent-'+i+'-chk"> '+esc(o.label)+'</label>' +
-        (o.detalle ? '<input type="text" id="ent-'+i+'-detalle" placeholder="'+esc(o.detalle)+'">' : '<span style="flex:1"></span>') +
-      '</div>';
-    }).join("");
-  }
-
-  function val(id){ var e=document.getElementById(id); return e?e.value.trim():""; }
-  function reviewItem(label, value){
-    return '<div class="review-item"><dt>'+esc(label)+'</dt><dd'+(value?'':' class="empty"')+'>'+(value?esc(value):'— sin datos —')+'</dd></div>';
-  }
-  function reviewGroup(title, step, itemsHtml){
-    return '<div class="review-group"><div class="review-group-head">'+esc(title)+'<button type="button" class="btn btn-ghost btn-sm" data-edit-step="'+step+'">Editar</button></div><div class="review-list">'+itemsHtml+'</div></div>';
-  }
-  function buildReview(){
-    var html = "";
-    html += reviewGroup("Institución educativa", 0,
-      reviewItem("Nombre", val("ie-nombre")) + reviewItem("Dirección", val("ie-direccion")) +
-      reviewItem("Región", val("ie-region")) + reviewItem("Provincia", val("ie-provincia")) +
-      reviewItem("Distrito", val("ie-distrito")) + reviewItem("Teléfono", val("ie-telefono")) +
-      reviewItem("Correo", val("ie-correo"))
-    );
-    html += reviewGroup("Director", 1,
-      reviewItem("Nombre completo", [val("d-nombres"),val("d-appat"),val("d-apmat")].filter(Boolean).join(" ")) +
-      reviewItem("Documento", [val("d-tipodoc"),val("d-numdoc")].filter(Boolean).join(" ")) +
-      reviewItem("Teléfono", val("d-telefono")) + reviewItem("Correo", val("d-correo"))
-    );
-    html += reviewGroup("Del trabajo", 2,
-      reviewItem("Tema", val("w-tema")) + reviewItem("Título", val("w-titulo")) + reviewItem("Seudónimo", val("w-seudonimo"))
-    );
-    var estItems = "";
-    participantIds.forEach(function(id,idx){
-      estItems += reviewItem("Estudiante "+(idx+1), [val("est"+id+"-nombres"),val("est"+id+"-appat"),val("est"+id+"-apmat")].filter(Boolean).join(" ") + (val("est"+id+"-grado") ? " · "+val("est"+id+"-grado") : ""));
-    });
-    html += reviewGroup("Estudiantes", 3, estItems);
-    html += reviewGroup("Profesor asesor", 4,
-      reviewItem("Nombre completo", [val("p-nombres"),val("p-appat"),val("p-apmat")].filter(Boolean).join(" ")) +
-      reviewItem("Documento", [val("p-tipodoc"),val("p-numdoc")].filter(Boolean).join(" ")) +
-      reviewItem("Correo", val("p-correo")) + reviewItem("Especialidad", val("p-especialidad"))
-    );
-    var enteraron = ENTERARON_OPCIONES.map(function(o,i){
-      var chk = document.getElementById("ent-"+i+"-chk");
-      return chk && chk.checked ? o.label : null;
-    }).filter(Boolean).join(", ");
-    html += reviewGroup("Cómo se enteraron", 5, reviewItem("Medios marcados", enteraron));
-    $("#reviewArea").innerHTML = html;
-    $all("[data-edit-step]", $("#reviewArea")).forEach(function(btn){
-      btn.addEventListener("click", function(){ goStep(parseInt(btn.dataset.editStep,10)); });
-    });
-  }
-
-  $("#ficha-form").addEventListener("submit", function(e){
-    e.preventDefault();
-    var codigo = "CE-2026-"+String(Math.floor(1000+Math.random()*8999))+"-"+String(Math.floor(100000+Math.random()*899999));
-    var ficha = {
-      id: nextFichaId++,
-      codigo: codigo,
-      preview:false,
-      colegio:{ nombre:val("ie-nombre"), direccion:val("ie-direccion"), region:val("ie-region"), provincia:val("ie-provincia"), distrito:val("ie-distrito"), telefono:val("ie-telefono"), correo:val("ie-correo") },
-      director:{ appat:val("d-appat"), apmat:val("d-apmat"), nombres:val("d-nombres"), tipodoc:val("d-tipodoc"), numdoc:val("d-numdoc"), telefono:val("d-telefono"), correo:val("d-correo") },
-      trabajo:{ tema:val("w-tema"), titulo:val("w-titulo"), seudonimo:val("w-seudonimo") || "Equipo sin seudónimo" },
-      estudiantes: participantIds.map(function(id){
-        return { appat:val("est"+id+"-appat"), apmat:val("est"+id+"-apmat"), nombres:val("est"+id+"-nombres"), tipodoc:val("est"+id+"-tipodoc"), numdoc:val("est"+id+"-numdoc"), grado:val("est"+id+"-grado"), telefono:val("est"+id+"-telefono"), correo:val("est"+id+"-correo") };
-      }),
-      profesor:{ appat:val("p-appat"), apmat:val("p-apmat"), nombres:val("p-nombres"), tipodoc:val("p-tipodoc"), numdoc:val("p-numdoc"), telefono:val("p-telefono"), correo:val("p-correo"), especialidad:val("p-especialidad"), cursos:val("p-cursos") },
-      entero: ENTERARON_OPCIONES.map(function(o,i){ var c=document.getElementById("ent-"+i+"-chk"); return c&&c.checked?o.label:null; }).filter(Boolean),
-      videoStatus:"pendiente",
-      createdAt: new Date().toLocaleDateString("es-PE",{day:"2-digit",month:"short",year:"numeric"}) + " · " + new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})
-    };
-    fichas.push(ficha);
-    $("#successCode").textContent = codigo;
-    switchView("success");
-    renderAll();
-  });
-
-  $("#btnAnother").addEventListener("click", startNuevaFicha);
-  $("#btnToList").addEventListener("click", function(){ switchView("fichas"); });
-  $("#btnGoUpload").addEventListener("click", function(){
-    switchView("upload");
-    var last = fichas[fichas.length-1];
-    if(last){ $("#up-ficha").value = last.id; renderUploadPreview(); }
-  });
-
-  /* ---------------- Subir video ---------------- */
-  function populateUploadSelect(){
-    var sel = $("#up-ficha");
-    var prev = sel.value;
-    sel.innerHTML = fichas.map(function(f){ return '<option value="'+f.id+'">'+esc(f.trabajo.seudonimo)+' · '+esc(f.codigo)+'</option>'; }).join("");
-    if(prev && fichas.some(function(f){return String(f.id)===prev;})) sel.value = prev;
-  }
-  function currentUploadFicha(){
-    var id = parseInt($("#up-ficha").value,10);
-    return fichas.find(function(f){ return f.id===id; });
-  }
-  function renderUploadPreview(){
-    var f = currentUploadFicha();
-    var wrap = $("#up-preview");
-    if(!f){ wrap.innerHTML=""; return; }
-    wrap.innerHTML = '<div class="ficha-preview">' +
-      '<div class="icon-badge"><svg class="icon" width="16" height="16"><use href="#i-video"/></svg></div>' +
-      '<div><div class="fp-title">'+esc(f.trabajo.titulo || "Sin título")+'</div><div class="fp-sub">'+esc(f.trabajo.seudonimo)+' · '+esc(f.codigo)+'</div></div>' +
-      '<div class="topbar-spacer"></div>' + statusBadge(f.videoStatus) +
-    '</div>';
-  }
-  $("#up-ficha").addEventListener("change", renderUploadPreview);
-
-  var upDropzone = $("#up-dropzone"), upFile = $("#up-file");
-  upDropzone.addEventListener("click", function(){ upFile.click(); });
-  ["dragenter","dragover"].forEach(function(ev){ upDropzone.addEventListener(ev, function(e){ e.preventDefault(); upDropzone.classList.add("drag-active"); }); });
-  ["dragleave","drop"].forEach(function(ev){ upDropzone.addEventListener(ev, function(e){ e.preventDefault(); upDropzone.classList.remove("drag-active"); }); });
-  upDropzone.addEventListener("drop", function(e){
-    if(e.dataTransfer.files.length){ upFile.files = e.dataTransfer.files; onUpFileChange(); }
-  });
-  upFile.addEventListener("change", onUpFileChange);
-  function onUpFileChange(){
-    var f = upFile.files[0];
-    $("#up-file-name").textContent = f ? f.name + " · " + (f.size/1048576).toFixed(1) + " MB" : "Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB";
-  }
-
-  $("#btnSubirVideo").addEventListener("click", function(){
-    var f = currentUploadFicha();
-    if(!f){ showToast("Selecciona una ficha primero."); return; }
-    if(!upFile.files[0]){ showToast("Elige un archivo de video para subir."); return; }
-    var file = upFile.files[0];
-    var progress = $("#up-progress"), bar = $("#up-progress-bar"), pct = $("#up-progress-pct");
-    progress.hidden = false;
-    upDropzone.setAttribute("data-disabled","true");
-    $("#btnSubirVideo").disabled = true;
-    var p = 0;
-    var timer = setInterval(function(){
-      p = Math.min(100, p + 8 + Math.random()*12);
-      bar.style.width = p+"%";
-      pct.textContent = Math.floor(p)+"%";
-      if(p>=100){
-        clearInterval(timer);
-        setTimeout(function(){
-          f.videoStatus = "subido";
-          uploads.unshift({ ficha:f, archivo:file.name, hora: new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"}) });
-          progress.hidden = true;
-          upDropzone.removeAttribute("data-disabled");
-          $("#btnSubirVideo").disabled = false;
-          upFile.value = "";
-          $("#up-file-name").textContent = "Ningún archivo seleccionado · MP4, MOV o AVI, máx. 2 GB";
-          showToast("Video de “"+f.trabajo.seudonimo+"” subido correctamente.");
-          renderAll();
-        }, 350);
-      }
-    }, 180);
-  });
-
-  function renderUploadsTable(){
-    var body = $("#uploadLogBody");
-    body.innerHTML = uploads.map(function(u){
-      return "<tr><td><b>"+esc(u.ficha.trabajo.seudonimo)+"</b><br><span class=\"mono\" style=\"font-size:11px;color:var(--text-faint)\">"+esc(u.ficha.codigo)+"</span></td><td>"+esc(u.archivo)+"</td><td>"+esc(u.hora)+"</td></tr>";
-    }).join("");
-    $("#uploadLogEmpty").hidden = uploads.length>0;
-  }
-
-  /* ---------------- Toast ---------------- */
-  var toastTimer = null;
-  function showToast(msg){
-    $("#toastMsg").textContent = msg;
-    var t = $("#toast");
-    t.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 3200);
-  }
-
-  $("#modalClose").addEventListener("click", function(){ $("#modalOverlay").classList.remove("show"); });
-
-  function renderAll(){
-    renderInicio();
-    renderFichaGrid();
-    populateUploadSelect();
-    renderUploadPreview();
-    renderUploadsTable();
-  }
-
-})();
-</script>
+</footer>
+</body>
+</html>
